@@ -169,14 +169,14 @@ public class CompoundSetUtilsClient {
      * CompoundSetFromFile
      * string staging_file_path
      * </pre>
-     * @param   stagingFilePath   instance of String
+     * @param   params   instance of type {@link us.kbase.compoundsetutils.CompoundsetUploadParams CompoundsetUploadParams} (original type "compoundset_upload_params")
      * @return   parameter "output" of type {@link us.kbase.compoundsetutils.CompoundsetUploadResults CompoundsetUploadResults} (original type "compoundset_upload_results")
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public CompoundsetUploadResults compoundSetFromFile(String stagingFilePath, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public CompoundsetUploadResults compoundSetFromFile(CompoundsetUploadParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
-        args.add(stagingFilePath);
+        args.add(params);
         TypeReference<List<CompoundsetUploadResults>> retType = new TypeReference<List<CompoundsetUploadResults>>() {};
         List<CompoundsetUploadResults> res = caller.jsonrpcCall("CompoundSetUtils.compound_set_from_file", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
@@ -189,16 +189,14 @@ public class CompoundSetUtilsClient {
      * obj_ref compound_set_ref
      * string output_format
      * </pre>
-     * @param   compoundSetRef   instance of original type "obj_ref"
-     * @param   outputFormat   instance of String
+     * @param   params   instance of type {@link us.kbase.compoundsetutils.CompoundsetDownloadParams CompoundsetDownloadParams} (original type "compoundset_download_params")
      * @return   parameter "output" of type {@link us.kbase.compoundsetutils.CompoundsetDownloadResults CompoundsetDownloadResults} (original type "compoundset_download_results")
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public CompoundsetDownloadResults compoundSetToFile(String compoundSetRef, String outputFormat, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public CompoundsetDownloadResults compoundSetToFile(CompoundsetDownloadParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
-        args.add(compoundSetRef);
-        args.add(outputFormat);
+        args.add(params);
         TypeReference<List<CompoundsetDownloadResults>> retType = new TypeReference<List<CompoundsetDownloadResults>>() {};
         List<CompoundsetDownloadResults> res = caller.jsonrpcCall("CompoundSetUtils.compound_set_to_file", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
@@ -210,16 +208,16 @@ public class CompoundSetUtilsClient {
      * CompoundSetFromModel
      * obj_ref model_ref
      * </pre>
-     * @param   modelRef   instance of original type "obj_ref"
-     * @return   parameter "output" of type {@link us.kbase.compoundsetutils.CompoundsetDownloadResults CompoundsetDownloadResults} (original type "compoundset_download_results")
+     * @param   params   instance of type {@link us.kbase.compoundsetutils.CompoundsetFromModelParams CompoundsetFromModelParams} (original type "compoundset_from_model_params")
+     * @return   parameter "output" of type {@link us.kbase.compoundsetutils.CompoundsetUploadResults CompoundsetUploadResults} (original type "compoundset_upload_results")
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public CompoundsetDownloadResults compoundSetFromModel(String modelRef, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public CompoundsetUploadResults compoundSetFromModel(CompoundsetFromModelParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
-        args.add(modelRef);
-        TypeReference<List<CompoundsetDownloadResults>> retType = new TypeReference<List<CompoundsetDownloadResults>>() {};
-        List<CompoundsetDownloadResults> res = caller.jsonrpcCall("CompoundSetUtils.compound_set_from_model", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        args.add(params);
+        TypeReference<List<CompoundsetUploadResults>> retType = new TypeReference<List<CompoundsetUploadResults>>() {};
+        List<CompoundsetUploadResults> res = caller.jsonrpcCall("CompoundSetUtils.compound_set_from_model", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 

@@ -33,46 +33,52 @@ class CompoundSetUtils(object):
             trust_all_ssl_certificates=trust_all_ssl_certificates,
             auth_svc=auth_svc)
 
-    def compound_set_from_file(self, staging_file_path, context=None):
+    def compound_set_from_file(self, params, context=None):
         """
         CompoundSetFromFile
         string staging_file_path
-        :param staging_file_path: instance of String
+        :param params: instance of type "compoundset_upload_params" ->
+           structure: parameter "workspace_name" of String, parameter
+           "staging_file_path" of String
         :returns: instance of type "compoundset_upload_results" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "compoundset_ref" of type "obj_ref"
         """
         return self._client.call_method(
             'CompoundSetUtils.compound_set_from_file',
-            [staging_file_path], self._service_ver, context)
+            [params], self._service_ver, context)
 
-    def compound_set_to_file(self, compound_set_ref, output_format, context=None):
+    def compound_set_to_file(self, params, context=None):
         """
         CompoundSetToFile
         obj_ref compound_set_ref
         string output_format
-        :param compound_set_ref: instance of type "obj_ref"
-        :param output_format: instance of String
+        :param params: instance of type "compoundset_download_params" ->
+           structure: parameter "workspace_name" of String, parameter
+           "compoundset_ref" of type "obj_ref", parameter "output_format" of
+           String
         :returns: instance of type "compoundset_download_results" ->
            structure: parameter "report_name" of String, parameter
            "report_ref" of String
         """
         return self._client.call_method(
             'CompoundSetUtils.compound_set_to_file',
-            [compound_set_ref, output_format], self._service_ver, context)
+            [params], self._service_ver, context)
 
-    def compound_set_from_model(self, model_ref, context=None):
+    def compound_set_from_model(self, params, context=None):
         """
         CompoundSetFromModel
         obj_ref model_ref
-        :param model_ref: instance of type "obj_ref"
-        :returns: instance of type "compoundset_download_results" ->
-           structure: parameter "report_name" of String, parameter
-           "report_ref" of String
+        :param params: instance of type "compoundset_from_model_params" ->
+           structure: parameter "workspace_name" of String, parameter
+           "model_ref" of type "obj_ref"
+        :returns: instance of type "compoundset_upload_results" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "compoundset_ref" of type "obj_ref"
         """
         return self._client.call_method(
             'CompoundSetUtils.compound_set_from_model',
-            [model_ref], self._service_ver, context)
+            [params], self._service_ver, context)
 
     def status(self, context=None):
         return self._client.call_method('CompoundSetUtils.status',

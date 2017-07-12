@@ -111,7 +111,7 @@ sub new
 
 =head2 compound_set_from_file
 
-  $output = $obj->compound_set_from_file($staging_file_path)
+  $output = $obj->compound_set_from_file($params)
 
 =over 4
 
@@ -120,8 +120,11 @@ sub new
 =begin html
 
 <pre>
-$staging_file_path is a string
+$params is a CompoundSetUtils.compoundset_upload_params
 $output is a CompoundSetUtils.compoundset_upload_results
+compoundset_upload_params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a string
+	staging_file_path has a value which is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
@@ -134,8 +137,11 @@ obj_ref is a string
 
 =begin text
 
-$staging_file_path is a string
+$params is a CompoundSetUtils.compoundset_upload_params
 $output is a CompoundSetUtils.compoundset_upload_results
+compoundset_upload_params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a string
+	staging_file_path has a value which is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
@@ -166,10 +172,10 @@ string staging_file_path
 							       "Invalid argument count for function compound_set_from_file (received $n, expecting 1)");
     }
     {
-	my($staging_file_path) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($staging_file_path)) or push(@_bad_arguments, "Invalid type for argument 1 \"staging_file_path\" (value was \"$staging_file_path\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to compound_set_from_file:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -204,7 +210,7 @@ string staging_file_path
 
 =head2 compound_set_to_file
 
-  $output = $obj->compound_set_to_file($compound_set_ref, $output_format)
+  $output = $obj->compound_set_to_file($params)
 
 =over 4
 
@@ -213,9 +219,12 @@ string staging_file_path
 =begin html
 
 <pre>
-$compound_set_ref is a CompoundSetUtils.obj_ref
-$output_format is a string
+$params is a CompoundSetUtils.compoundset_download_params
 $output is a CompoundSetUtils.compoundset_download_results
+compoundset_download_params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a string
+	compoundset_ref has a value which is a CompoundSetUtils.obj_ref
+	output_format has a value which is a string
 obj_ref is a string
 compoundset_download_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
@@ -227,9 +236,12 @@ compoundset_download_results is a reference to a hash where the following keys a
 
 =begin text
 
-$compound_set_ref is a CompoundSetUtils.obj_ref
-$output_format is a string
+$params is a CompoundSetUtils.compoundset_download_params
 $output is a CompoundSetUtils.compoundset_download_results
+compoundset_download_params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a string
+	compoundset_ref has a value which is a CompoundSetUtils.obj_ref
+	output_format has a value which is a string
 obj_ref is a string
 compoundset_download_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
@@ -254,17 +266,16 @@ string output_format
 
 # Authentication: required
 
-    if ((my $n = @args) != 2)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function compound_set_to_file (received $n, expecting 2)");
+							       "Invalid argument count for function compound_set_to_file (received $n, expecting 1)");
     }
     {
-	my($compound_set_ref, $output_format) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($compound_set_ref)) or push(@_bad_arguments, "Invalid type for argument 1 \"compound_set_ref\" (value was \"$compound_set_ref\")");
-        (!ref($output_format)) or push(@_bad_arguments, "Invalid type for argument 2 \"output_format\" (value was \"$output_format\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to compound_set_to_file:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -299,7 +310,7 @@ string output_format
 
 =head2 compound_set_from_model
 
-  $output = $obj->compound_set_from_model($model_ref)
+  $output = $obj->compound_set_from_model($params)
 
 =over 4
 
@@ -308,12 +319,16 @@ string output_format
 =begin html
 
 <pre>
-$model_ref is a CompoundSetUtils.obj_ref
-$output is a CompoundSetUtils.compoundset_download_results
+$params is a CompoundSetUtils.compoundset_from_model_params
+$output is a CompoundSetUtils.compoundset_upload_results
+compoundset_from_model_params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a string
+	model_ref has a value which is a CompoundSetUtils.obj_ref
 obj_ref is a string
-compoundset_download_results is a reference to a hash where the following keys are defined:
+compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
+	compoundset_ref has a value which is a CompoundSetUtils.obj_ref
 
 </pre>
 
@@ -321,12 +336,16 @@ compoundset_download_results is a reference to a hash where the following keys a
 
 =begin text
 
-$model_ref is a CompoundSetUtils.obj_ref
-$output is a CompoundSetUtils.compoundset_download_results
+$params is a CompoundSetUtils.compoundset_from_model_params
+$output is a CompoundSetUtils.compoundset_upload_results
+compoundset_from_model_params is a reference to a hash where the following keys are defined:
+	workspace_name has a value which is a string
+	model_ref has a value which is a CompoundSetUtils.obj_ref
 obj_ref is a string
-compoundset_download_results is a reference to a hash where the following keys are defined:
+compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
+	compoundset_ref has a value which is a CompoundSetUtils.obj_ref
 
 
 =end text
@@ -352,10 +371,10 @@ obj_ref model_ref
 							       "Invalid argument count for function compound_set_from_model (received $n, expecting 1)");
     }
     {
-	my($model_ref) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($model_ref)) or push(@_bad_arguments, "Invalid type for argument 1 \"model_ref\" (value was \"$model_ref\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to compound_set_from_model:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -501,6 +520,38 @@ a string
 
 
 
+=head2 compoundset_upload_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspace_name has a value which is a string
+staging_file_path has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspace_name has a value which is a string
+staging_file_path has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 compoundset_upload_results
 
 =over 4
@@ -559,6 +610,72 @@ report_ref has a value which is a string
 a reference to a hash where the following keys are defined:
 report_name has a value which is a string
 report_ref has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 compoundset_download_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspace_name has a value which is a string
+compoundset_ref has a value which is a CompoundSetUtils.obj_ref
+output_format has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspace_name has a value which is a string
+compoundset_ref has a value which is a CompoundSetUtils.obj_ref
+output_format has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 compoundset_from_model_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspace_name has a value which is a string
+model_ref has a value which is a CompoundSetUtils.obj_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspace_name has a value which is a string
+model_ref has a value which is a CompoundSetUtils.obj_ref
 
 
 =end text

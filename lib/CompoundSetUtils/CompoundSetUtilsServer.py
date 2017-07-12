@@ -335,15 +335,15 @@ class Application(object):
         self.method_authentication = dict()
         self.rpc_service.add(impl_CompoundSetUtils.compound_set_from_file,
                              name='CompoundSetUtils.compound_set_from_file',
-                             types=[basestring])
+                             types=[dict])
         self.method_authentication['CompoundSetUtils.compound_set_from_file'] = 'required'  # noqa
         self.rpc_service.add(impl_CompoundSetUtils.compound_set_to_file,
                              name='CompoundSetUtils.compound_set_to_file',
-                             types=[basestring, basestring])
+                             types=[dict])
         self.method_authentication['CompoundSetUtils.compound_set_to_file'] = 'required'  # noqa
         self.rpc_service.add(impl_CompoundSetUtils.compound_set_from_model,
                              name='CompoundSetUtils.compound_set_from_model',
-                             types=[basestring])
+                             types=[dict])
         self.method_authentication['CompoundSetUtils.compound_set_from_model'] = 'required'  # noqa
         self.rpc_service.add(impl_CompoundSetUtils.status,
                              name='CompoundSetUtils.status',
