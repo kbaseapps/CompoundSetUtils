@@ -76,7 +76,7 @@ class CompoundSetUtilsTest(unittest.TestCase):
         return self.__class__.ctx
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
-    def test_your_method(self):
+    def test_compound_set_from_file_tsv(self):
         # Prepare test objects in workspace if needed using
         # self.getWsClient().save_objects({'workspace': self.getWsName(),
         #                                  'objects': []})
@@ -86,4 +86,5 @@ class CompoundSetUtilsTest(unittest.TestCase):
         #
         # Check returned data with
         # self.assertEqual(ret[...], ...) or other unittest methods
-        pass
+        ret = self.getImpl().compound_set_from_file({'workspace': 'jjeffryes:narrative_1497984704461'
+                                                     ''})
