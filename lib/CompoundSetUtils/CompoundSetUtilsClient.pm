@@ -125,6 +125,7 @@ $output is a CompoundSetUtils.compoundset_upload_results
 compoundset_upload_params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a string
 	staging_file_path has a value which is a string
+	compound_set_name has a value which is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
@@ -142,6 +143,7 @@ $output is a CompoundSetUtils.compoundset_upload_results
 compoundset_upload_params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a string
 	staging_file_path has a value which is a string
+	compound_set_name has a value which is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
@@ -324,6 +326,7 @@ $output is a CompoundSetUtils.compoundset_upload_results
 compoundset_from_model_params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a string
 	model_ref has a value which is a CompoundSetUtils.obj_ref
+	compound_set_name has a value which is a string
 obj_ref is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
@@ -341,6 +344,7 @@ $output is a CompoundSetUtils.compoundset_upload_results
 compoundset_from_model_params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a string
 	model_ref has a value which is a CompoundSetUtils.obj_ref
+	compound_set_name has a value which is a string
 obj_ref is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
@@ -534,6 +538,7 @@ a string
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a string
 staging_file_path has a value which is a string
+compound_set_name has a value which is a string
 
 </pre>
 
@@ -544,6 +549,7 @@ staging_file_path has a value which is a string
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a string
 staging_file_path has a value which is a string
+compound_set_name has a value which is a string
 
 
 =end text
@@ -666,6 +672,7 @@ output_format has a value which is a string
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a string
 model_ref has a value which is a CompoundSetUtils.obj_ref
+compound_set_name has a value which is a string
 
 </pre>
 
@@ -676,6 +683,7 @@ model_ref has a value which is a CompoundSetUtils.obj_ref
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a string
 model_ref has a value which is a CompoundSetUtils.obj_ref
+compound_set_name has a value which is a string
 
 
 =end text

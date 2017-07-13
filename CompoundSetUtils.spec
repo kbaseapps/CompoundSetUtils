@@ -54,7 +54,10 @@ module CompoundSetUtils {
 
     /*
         CompoundSetFromModel
+        required:
+        string workspace_name
         obj_ref model_ref
+        string compound_set_name
     */
 
     funcdef compound_set_from_model(compoundset_from_model_params params)

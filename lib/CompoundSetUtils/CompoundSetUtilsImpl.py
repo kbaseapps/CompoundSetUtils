@@ -3,6 +3,7 @@
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from Workspace.WorkspaceClient import Workspace
 from KBaseReport.KBaseReportClient import KBaseReport
+import CompoundSetUtils.compound_parsing as parse
 import os
 #END_HEADER
 
@@ -25,7 +26,7 @@ Contains tools for import & export of compound sets
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:JamesJeffryes/CompoundSetUtils.git"
-    GIT_COMMIT_HASH = "cd20cd721b1743c26fc8ca552a3e5cec69603b2f"
+    GIT_COMMIT_HASH = "443c6741e296fea54da5f68268e68c74940f07fe"
 
     #BEGIN_CLASS_HEADER
     @staticmethod
@@ -36,6 +37,32 @@ Contains tools for import & export of compound sets
         for param in param_list:
             if param not in in_params or not in_params[param]:
                 raise ValueError('{} parameter is required'.format(param))
+
+    def _save_to_ws_and_report(self, params, compoundset):
+        """Save compound set to the workspace and make report"""
+        compoundset_ref = self.ws_client.save_objects(
+            {'id': params['workspace_name'],
+             "objects": [{
+                 "type": "Biochemistry.CompoundSet",
+                 "data": compoundset,
+                 "name": params['workspace_name']
+             }]})[0]
+
+        report_params = {
+            'objects_created': [compoundset_ref],
+            'message': 'Imported %s as %s' % (params['staging_file_path'],
+                                              compoundset_ref),
+            'workspace_name': params['workspace_name'],
+            'report_object_name': 'compound_set_creation_report'
+        }
+
+        # Construct the output to send back
+        report_client = KBaseReport(self.callback_url)
+        report_info = report_client.create_extended_report(report_params)
+        output = {'report_name': report_info['name'],
+                  'report_ref': report_info['ref'],
+                  'compoundset_ref': compoundset_ref}
+        return output
 
     #END_CLASS_HEADER
 
@@ -53,14 +80,14 @@ Contains tools for import & export of compound sets
         #END_CONSTRUCTOR
         pass
 
-
     def compound_set_from_file(self, ctx, params):
         """
         CompoundSetFromFile
         string staging_file_path
         :param params: instance of type "compoundset_upload_params" ->
            structure: parameter "workspace_name" of String, parameter
-           "staging_file_path" of String
+           "staging_file_path" of String, parameter "compound_set_name" of
+           String
         :returns: instance of type "compoundset_upload_results" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "compoundset_ref" of type "obj_ref"
@@ -77,36 +104,13 @@ Contains tools for import & export of compound sets
 
         ext = os.path.splitext(scratch_file_path)[1]
         if ext == 'sdf':
-            raise NotImplementedError
+            compoundset = parse.read_sdf(scratch_file_path)
         elif ext == 'tsv':
-            compoundset = None
+            compoundset = parse.read_tsv(scratch_file_path)
         else:
             raise ValueError('Invalid input file type. Expects .tsv or .sdf')
 
-        compoundset_ref = self.ws_client.save_objects(
-            {'id': params['workspace_name'],
-             "objects": [{
-                 "type": "Biochemistry.CompoundSet",
-                 "data": compoundset,
-                 "name": params['workspace_name']
-             }]})[0]
-
-        report_params = {
-            'objects_created': [],
-            'message': 'Imported %s as %s' % (params['staging_file_path'],
-                                              compoundset_ref),
-            'workspace_name': params['workspace_name'],
-            'report_object_name': 'compound_set_from_file_report'
-        }
-
-        # Construct the output to send back
-        report_client = KBaseReport(self.callback_url)
-        report_info = report_client.create_extended_report(report_params)
-        output = {'report_name': report_info['name'],
-                  'report_ref': report_info['ref'],
-                  'compoundset_ref': compoundset_ref
-                  }
-
+        output = self._save_to_ws_and_report(params, compoundset)
 
         #END compound_set_from_file
 
@@ -133,6 +137,38 @@ Contains tools for import & export of compound sets
         # ctx is the context object
         # return variables are: output
         #BEGIN compound_set_to_file
+        self._check_required_param(params, ['workspace_name', 'compoundset_ref',
+                                            'output_format'])
+        compoundset = self.ws_client.get_objects2({'objects': [
+            {'ref': params['compoundset_ref']}]})['data'][0]['data']
+        ext = params['output_format']
+        if ext == 'sdf':
+            outfile_path = parse.write_sdf(compoundset)
+        elif ext == 'tsv':
+            outfile_path = parse.write_tsv(compoundset)
+        else:
+            raise ValueError('Invalid output file type. Expects tsv or sdf')
+
+        report_files = [{'path': outfile_path,
+                         'name': os.path.basename(outfile_path),
+                         'label': os.path.basename(outfile_path),
+                         'description': 'A compound set in %s format' % ext}]
+
+        report_params = {
+            'objects_created': [],
+            'message': 'Converted %s compound set to %s format.' % (
+                params['compoundset_ref'], params['output_format']),
+            'file_links': report_files,
+            'workspace_name': params['workspace_name'],
+            'report_object_name': 'compound_set_download_report'
+        }
+
+        # Construct the output to send back
+        report_client = KBaseReport(self.callback_url)
+        report_info = report_client.create_extended_report(report_params)
+        output = {'report_name': report_info['name'],
+                  'report_ref': report_info['ref'],
+                  }
         #END compound_set_to_file
 
         # At some point might do deeper type checking...
@@ -148,7 +184,8 @@ Contains tools for import & export of compound sets
         obj_ref model_ref
         :param params: instance of type "compoundset_from_model_params" ->
            structure: parameter "workspace_name" of String, parameter
-           "model_ref" of type "obj_ref"
+           "model_ref" of type "obj_ref", parameter "compound_set_name" of
+           String
         :returns: instance of type "compoundset_upload_results" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "compoundset_ref" of type "obj_ref"
@@ -158,6 +195,10 @@ Contains tools for import & export of compound sets
         #BEGIN compound_set_from_model
         self._check_required_param(params, ['workspace_name', 'model_ref',
                                             'compound_set_name'])
+        model = self.ws_client.get_objects2({'objects': [
+            {'ref': params['model_ref']}]})['data'][0]['data']
+        compoundset = parse.parse_model(model)
+        output = self._save_to_ws_and_report(params, compoundset)
         #END compound_set_from_model
 
         # At some point might do deeper type checking...
@@ -166,6 +207,7 @@ Contains tools for import & export of compound sets
                              'output is not type dict as required.')
         # return the results
         return [output]
+
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",
