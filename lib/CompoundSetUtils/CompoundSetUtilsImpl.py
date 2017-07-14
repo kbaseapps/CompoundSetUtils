@@ -39,8 +39,15 @@ Contains tools for import & export of compound sets
             if param not in in_params or not in_params[param]:
                 raise ValueError('{} parameter is required'.format(param))
 
-    def _save_to_ws_and_report(self, workspace, source, compoundset):
+    def _save_to_ws_and_report(self, ctx, method, workspace, source, compoundset):
         """Save compound set to the workspace and make report"""
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        if 'model' in method:
+            provenance[0]['input_ws_objects'] = workspace + '/' + source
+        provenance[0]['service'] = 'CompoundSetUtils'
+        provenance[0]['method'] = method
         info = self.ws_client.save_objects(
             {'workspace': workspace,
              "objects": [{
@@ -64,8 +71,7 @@ Contains tools for import & export of compound sets
                   'report_ref': report_info['ref'],
                   'compoundset_ref': compoundset_ref}
         return output
-
-    #END_CLASS_HEADER
+        #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
     # be found
@@ -102,6 +108,7 @@ Contains tools for import & export of compound sets
         scratch_file_path = self.dfu.download_staging_file(
             {'staging_file_subdir_path': params['staging_file_path']}
         ).get('copy_file_path')
+        # I probably should be uploading the raw files to shock
 
         ext = os.path.splitext(scratch_file_path)[1]
         file_name = os.path.basename(scratch_file_path)
@@ -119,7 +126,8 @@ Contains tools for import & export of compound sets
             'compounds': compounds,
         }
 
-        output = self._save_to_ws_and_report(params['workspace_name'],
+        output = self._save_to_ws_and_report(ctx, 'compound_set_from_file',
+                                             params['workspace_name'],
                                              params['staging_file_path'],
                                              compoundset)
         #END compound_set_from_file
@@ -220,7 +228,8 @@ Contains tools for import & export of compound sets
             'compounds': compounds,
         }
 
-        output = self._save_to_ws_and_report(params['workspace_name'],
+        output = self._save_to_ws_and_report(ctx, 'compound_set_from_model',
+                                             params['workspace_name'],
                                              params['model_name'], compoundset)
         #END compound_set_from_model
 
