@@ -1,0 +1,49 @@
+#
+# define display information
+#
+name: Import CompoundSet from File
+
+tooltip: |
+    This method imports a file from the staging area as a CompoundSet
+
+screenshots: []
+
+icon: icon.png
+
+#
+# define a set of similar methods that might be useful to the user
+#
+suggestions:
+    apps:
+        related:
+            []
+        next:
+            []
+    methods:
+        related:
+            []
+        next:
+            []
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    staging_file_path :
+        ui-name : |
+            Stageing File Path
+        short-hint : |
+            The path to the file to import in stageing.
+        long-hint  : |
+            The path to the file to import in stageing.
+    compound_set_name :
+        ui-name : |
+            Compound Set Name
+        short-hint : |
+            The name for the compound set to be produced.
+        long-hint  : |
+            The name for the compound set to be produced.
+
+
+description : |
+    <p>This app allows for the import of compound structures from SDF or TSV files in the stageing area.</p>

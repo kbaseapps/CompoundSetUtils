@@ -1,0 +1,73 @@
+{
+    "ver": "0.0.1",
+    "authors": [
+        "jjeffryes"
+    ],
+    "contact": "",
+    "categories": ["active"],
+    "widgets": {
+        "input": null,
+        "output": null
+    },
+    "parameters": [ 
+        {
+            "id": "staging_file_path",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ]
+            }
+        },
+        {
+            "id" : "compound_set_name",
+            "optional" : false,
+            "advanced" : false,
+            "allow_multiple" : false,
+            "default_values" : [ "" ],
+            "field_type" : "text",
+            "text_options" : {
+            "valid_ws_types" : [ "KBaseBiochem.CompoundSet" ],
+            "is_output_name":true
+            }
+         }
+    ],
+    "behavior": {
+        "service-mapping": {
+            "url": "",
+            "name": "CompoundSetUtils",
+            "method": "compound_set_from_file",
+            "input_mapping": [
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "workspace_name"
+                },
+                {
+                    "input_parameter": "staging_file_path",
+                    "target_property": "staging_file_path"
+                },
+                {
+                    "input_parameter": "compound_set_name",
+                    "target_property": "compound_set_name"
+                }
+            ],
+            "output_mapping": [
+                {
+                    "service_method_output_path": [0,"report_name"],
+                    "target_property": "report_name"
+                },
+                {
+                    "service_method_output_path": [0,"report_ref"],
+                    "target_property": "report_ref"
+                },
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "workspace_name"
+                }
+            ]
+        }
+    },
+    "job_id_output_field": "docker"
+}
