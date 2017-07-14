@@ -100,15 +100,6 @@ class CompoundSetUtilsTest(unittest.TestCase):
     @patch.object(DataFileUtil, "download_staging_file",
                   new=fake_staging_download)
     def test_compound_set_from_file_tsv(self):
-        # Prepare test objects in workspace if needed using
-        # self.getWsClient().save_objects({'workspace': self.getWsName(),
-        #                                  'objects': []})
-        #
-        # Run your method by
-        # ret = self.getImpl().your_method(self.getContext(), parameters...)
-        #
-        # Check returned data with
-        # self.assertEqual(ret[...], ...) or other unittest methods
         params = {'workspace_name': self.getWsName(),
                   'staging_file_path': 'test_compounds.tsv',
                   'compound_set_name': 'sdf_set'}
@@ -135,3 +126,15 @@ class CompoundSetUtilsTest(unittest.TestCase):
                   'compoundset_ref': compoundset_ref,
                   'output_format': 'sdf'}
         ret = self.getImpl().compound_set_to_file(self.getContext(), params)
+
+    def test_compound_set_from_model(self):
+        model = json.load(open('/kb/module/test/iMR1_799.json'))
+        ws_obj = {"type": "KBaseFBA.FBAModel", "data": model,
+                  "name": model['name']}
+        info = self.getWsClient().save_objects({'workspace': self.getWsName(),
+                                                "objects": [ws_obj]})[0]
+        model_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+        params = {'workspace_name': self.getWsName(),
+                  'model_ref': model_ref,
+                  'compound_set_name': 'model_set'}
+        ret = self.getImpl().compound_set_from_model(self.getContext(), params)

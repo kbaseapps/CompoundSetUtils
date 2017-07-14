@@ -39,21 +39,21 @@ Contains tools for import & export of compound sets
             if param not in in_params or not in_params[param]:
                 raise ValueError('{} parameter is required'.format(param))
 
-    def _save_to_ws_and_report(self, params, compoundset):
+    def _save_to_ws_and_report(self, workspace, source, compoundset):
         """Save compound set to the workspace and make report"""
         info = self.ws_client.save_objects(
-            {'workspace': params['workspace_name'],
+            {'workspace': workspace,
              "objects": [{
                  "type": "KBaseBiochem.CompoundSet",
                  "data": compoundset,
-                 "name": params['workspace_name']
+                 "name": compoundset['name']
              }]})[0]
         compoundset_ref = "%s/%s/%s" % (info[6], info[0], info[4])
         report_params = {
-            #'objects_created': [compoundset_ref],
-            'message': 'Imported %s as %s' % (params['staging_file_path'],
-                                              compoundset_ref),
-            'workspace_name': params['workspace_name'],
+            'objects_created': [{'ref': compoundset_ref,
+                                 'description': 'Compound Set'}],
+            'message': 'Imported %s as %s' % (source, compoundset_ref),
+            'workspace_name': workspace,
             'report_object_name': 'compound_set_creation_report'
         }
 
@@ -118,8 +118,9 @@ Contains tools for import & export of compound sets
             'compounds': compounds,
         }
 
-        output = self._save_to_ws_and_report(params, compoundset)
-
+        output = self._save_to_ws_and_report(params['workspace_name'],
+                                             params['staging_file_path'],
+                                             compoundset)
         #END compound_set_from_file
 
         # At some point might do deeper type checking...
@@ -206,8 +207,17 @@ Contains tools for import & export of compound sets
                                             'compound_set_name'])
         model = self.ws_client.get_objects2({'objects': [
             {'ref': params['model_ref']}]})['data'][0]['data']
-        compoundset = parse.parse_model(model)
-        output = self._save_to_ws_and_report(params, compoundset)
+        compounds, undef = parse.parse_model(model)
+        compoundset = {
+            'id': params['compound_set_name'],
+            'name': params['compound_set_name'],
+            'description': 'Compound Set produced from %s, a metabolic model'
+                           % model['id'],
+            'compounds': compounds,
+        }
+
+        output = self._save_to_ws_and_report(params['workspace_name'],
+                                             params['model_ref'], compoundset)
         #END compound_set_from_model
 
         # At some point might do deeper type checking...

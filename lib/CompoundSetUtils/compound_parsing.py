@@ -1,6 +1,7 @@
 from rdkit.Chem import AllChem, Descriptors
 import os
 import csv
+import json
 
 
 def _make_compound_info(mol_object):
@@ -55,8 +56,27 @@ def read_sdf(file_path):
     return compounds
 
 
-def parse_model(model):
-    raise NotImplementedError
+def parse_model(model, struct_path='/kb/module/data/Compound_Structures.json'):
+    # At the moment this function relies on cached data. when I get a chance
+    # I'll figure how to pull the biochemistry object from the workspace so it
+    # stays up to date
+    struct_dict = json.load(open(struct_path))
+    compounds = []
+    undef_structures = []
+    for model_comp in model['modelcompounds']:
+        cid = model_comp['id'].split('_')[0]
+        if cid not in struct_dict:
+            undef_structures.append(cid)
+            continue
+        set_comp = {'id': cid,
+                    'name': model_comp['name'],
+                    'compound_ref': model_comp['compound_ref'],
+                    'modelcompound_ref': model_comp['id'],
+                    }
+        mol = AllChem.MolFromInchi(str(struct_dict[cid]))
+        set_comp.update(_make_compound_info(mol))
+        compounds.append(set_comp)
+    return compounds, undef_structures
 
 
 def write_tsv(compound_set, outfile_path):
