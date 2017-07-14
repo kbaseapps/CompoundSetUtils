@@ -93,8 +93,7 @@ class CompoundSetUtilsTest(unittest.TestCase):
                   "name": comp_set['name']}
         info = self.getWsClient().save_objects({'workspace': self.getWsName(),
                                                 "objects": [ws_obj]})[0]
-        compoundset_ref = "%s/%s/%s" % (info[6], info[0], info[4])
-        return compoundset_ref
+        return comp_set['name']
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     @patch.object(DataFileUtil, "download_staging_file",
@@ -116,14 +115,14 @@ class CompoundSetUtilsTest(unittest.TestCase):
     def test_compound_set_to_file_tsv(self):
         compoundset_ref = self.save_compound_set()
         params = {'workspace_name': self.getWsName(),
-                  'compoundset_ref': compoundset_ref,
+                  'compound_set_name': compoundset_ref,
                   'output_format': 'tsv'}
         ret = self.getImpl().compound_set_to_file(self.getContext(), params)
 
     def test_compound_set_to_file_sdf(self):
         compoundset_ref = self.save_compound_set()
         params = {'workspace_name': self.getWsName(),
-                  'compoundset_ref': compoundset_ref,
+                  'compound_set_name': compoundset_ref,
                   'output_format': 'sdf'}
         ret = self.getImpl().compound_set_to_file(self.getContext(), params)
 
@@ -133,8 +132,7 @@ class CompoundSetUtilsTest(unittest.TestCase):
                   "name": model['name']}
         info = self.getWsClient().save_objects({'workspace': self.getWsName(),
                                                 "objects": [ws_obj]})[0]
-        model_ref = "%s/%s/%s" % (info[6], info[0], info[4])
         params = {'workspace_name': self.getWsName(),
-                  'model_ref': model_ref,
+                  'model_name': model['name'],
                   'compound_set_name': 'model_set'}
         ret = self.getImpl().compound_set_from_model(self.getContext(), params)

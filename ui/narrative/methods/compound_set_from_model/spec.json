@@ -11,7 +11,7 @@
     },
     "parameters": [
         {
-            "id" : "model_ref",
+            "id" : "model_name",
             "optional" : false,
             "advanced" : false,
             "allow_multiple" : false,
@@ -45,8 +45,8 @@
                     "target_property": "workspace_name"
                 },
                 {
-                    "input_parameter": "model_ref",
-                    "target_property": "model_ref"
+                    "input_parameter": "model_name",
+                    "target_property": "model_name"
                 },
                 {
                     "input_parameter": "compound_set_name",

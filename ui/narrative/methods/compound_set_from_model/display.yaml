@@ -1,10 +1,10 @@
 #
 # define display information
 #
-name: Export CompoundSet to File
+name: Make CompoundSet from Metabolic Model
 
 tooltip: |
-    This method genrerate a file of the specified format from CompoundSet
+    This method genrerate a CompoundSet from compounds in a Metabolic Model
 
 screenshots: []
 
@@ -29,13 +29,13 @@ suggestions:
 # Configure the display and description of parameters
 #
 parameters :
-    model_ref :
+    model_name :
         ui-name : |
-            CompoundSet
+            Metabolic Model
         short-hint : |
-            The Compound Set to export.
+            The source Metabolic Model for the Compound Set.
         long-hint  : |
-            The Compound Set to export.
+            The source Metabolic Model for the Compound Set.
     compound_set_name :
         ui-name : |
             Compound Set Name

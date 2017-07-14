@@ -27,7 +27,7 @@ Contains tools for import & export of compound sets
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "git@github.com:JamesJeffryes/CompoundSetUtils.git"
-    GIT_COMMIT_HASH = "443c6741e296fea54da5f68268e68c74940f07fe"
+    GIT_COMMIT_HASH = "0cc47a61a463f100590aa92f7fdaa714cbd6fa0d"
 
     #BEGIN_CLASS_HEADER
     @staticmethod
@@ -79,6 +79,7 @@ Contains tools for import & export of compound sets
         self.dfu = DataFileUtil(self.callback_url)
         #END_CONSTRUCTOR
         pass
+
 
     def compound_set_from_file(self, ctx, params):
         """
@@ -133,12 +134,11 @@ Contains tools for import & export of compound sets
     def compound_set_to_file(self, ctx, params):
         """
         CompoundSetToFile
-        obj_ref compound_set_ref
+        string compound_set_name
         string output_format
         :param params: instance of type "compoundset_download_params" ->
            structure: parameter "workspace_name" of String, parameter
-           "compoundset_ref" of type "obj_ref", parameter "output_format" of
-           String
+           "compound_set_name" of String, parameter "output_format" of String
         :returns: instance of type "compoundset_download_results" ->
            structure: parameter "report_name" of String, parameter
            "report_ref" of String
@@ -146,10 +146,11 @@ Contains tools for import & export of compound sets
         # ctx is the context object
         # return variables are: output
         #BEGIN compound_set_to_file
-        self._check_required_param(params, ['workspace_name', 'compoundset_ref',
+        self._check_required_param(params, ['workspace_name', 'compound_set_name',
                                             'output_format'])
         compoundset = self.ws_client.get_objects2({'objects': [
-            {'ref': params['compoundset_ref']}]})['data'][0]['data']
+            {'workspace': params['workspace_name'],
+             'name': params['compound_set_name']}]})['data'][0]['data']
         ext = params['output_format']
         out = "%s/%s.%s" % (self.scratch, compoundset['name'], ext)
         if ext == 'sdf':
@@ -167,7 +168,7 @@ Contains tools for import & export of compound sets
         report_params = {
             'objects_created': [],
             'message': 'Converted %s compound set to %s format.' % (
-                params['compoundset_ref'], params['output_format']),
+                params['compound_set_name'], params['output_format']),
             'file_links': report_files,
             'workspace_name': params['workspace_name'],
             'report_object_name': 'compound_set_download_report'
@@ -191,11 +192,13 @@ Contains tools for import & export of compound sets
     def compound_set_from_model(self, ctx, params):
         """
         CompoundSetFromModel
-        obj_ref model_ref
+        required:
+        string workspace_name
+        string model_name
+        string compound_set_name
         :param params: instance of type "compoundset_from_model_params" ->
            structure: parameter "workspace_name" of String, parameter
-           "model_ref" of type "obj_ref", parameter "compound_set_name" of
-           String
+           "model_name" of String, parameter "compound_set_name" of String
         :returns: instance of type "compoundset_upload_results" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "compoundset_ref" of type "obj_ref"
@@ -203,10 +206,11 @@ Contains tools for import & export of compound sets
         # ctx is the context object
         # return variables are: output
         #BEGIN compound_set_from_model
-        self._check_required_param(params, ['workspace_name', 'model_ref',
+        self._check_required_param(params, ['workspace_name', 'model_name',
                                             'compound_set_name'])
         model = self.ws_client.get_objects2({'objects': [
-            {'ref': params['model_ref']}]})['data'][0]['data']
+            {'workspace': params['workspace_name'],
+             'name': params['model_name']}]})['data'][0]['data']
         compounds, undef = parse.parse_model(model)
         compoundset = {
             'id': params['compound_set_name'],
@@ -217,7 +221,7 @@ Contains tools for import & export of compound sets
         }
 
         output = self._save_to_ws_and_report(params['workspace_name'],
-                                             params['model_ref'], compoundset)
+                                             params['model_name'], compoundset)
         #END compound_set_from_model
 
         # At some point might do deeper type checking...
@@ -226,7 +230,6 @@ Contains tools for import & export of compound sets
                              'output is not type dict as required.')
         # return the results
         return [output]
-
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",

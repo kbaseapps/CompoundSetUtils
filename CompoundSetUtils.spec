@@ -33,13 +33,13 @@ module CompoundSetUtils {
 
     typedef structure {
         string workspace_name;
-        obj_ref compoundset_ref;
+        string compound_set_name;
         string output_format;
     } compoundset_download_params;
 
     /*
         CompoundSetToFile
-        obj_ref compound_set_ref
+        string compound_set_name
         string output_format
     */
 
@@ -48,7 +48,7 @@ module CompoundSetUtils {
 
     typedef structure {
         string workspace_name;
-        obj_ref model_ref;
+        string model_name;
         string compound_set_name;
     } compoundset_from_model_params;
 
@@ -56,7 +56,7 @@ module CompoundSetUtils {
         CompoundSetFromModel
         required:
         string workspace_name
-        obj_ref model_ref
+        string model_name
         string compound_set_name
     */
 

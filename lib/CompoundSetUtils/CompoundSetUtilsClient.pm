@@ -225,9 +225,8 @@ $params is a CompoundSetUtils.compoundset_download_params
 $output is a CompoundSetUtils.compoundset_download_results
 compoundset_download_params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a string
-	compoundset_ref has a value which is a CompoundSetUtils.obj_ref
+	compound_set_name has a value which is a string
 	output_format has a value which is a string
-obj_ref is a string
 compoundset_download_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
@@ -242,9 +241,8 @@ $params is a CompoundSetUtils.compoundset_download_params
 $output is a CompoundSetUtils.compoundset_download_results
 compoundset_download_params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a string
-	compoundset_ref has a value which is a CompoundSetUtils.obj_ref
+	compound_set_name has a value which is a string
 	output_format has a value which is a string
-obj_ref is a string
 compoundset_download_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
@@ -255,7 +253,7 @@ compoundset_download_results is a reference to a hash where the following keys a
 =item Description
 
 CompoundSetToFile
-obj_ref compound_set_ref
+string compound_set_name
 string output_format
 
 =back
@@ -325,13 +323,13 @@ $params is a CompoundSetUtils.compoundset_from_model_params
 $output is a CompoundSetUtils.compoundset_upload_results
 compoundset_from_model_params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a string
-	model_ref has a value which is a CompoundSetUtils.obj_ref
+	model_name has a value which is a string
 	compound_set_name has a value which is a string
-obj_ref is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
 	compoundset_ref has a value which is a CompoundSetUtils.obj_ref
+obj_ref is a string
 
 </pre>
 
@@ -343,13 +341,13 @@ $params is a CompoundSetUtils.compoundset_from_model_params
 $output is a CompoundSetUtils.compoundset_upload_results
 compoundset_from_model_params is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a string
-	model_ref has a value which is a CompoundSetUtils.obj_ref
+	model_name has a value which is a string
 	compound_set_name has a value which is a string
-obj_ref is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
 	compoundset_ref has a value which is a CompoundSetUtils.obj_ref
+obj_ref is a string
 
 
 =end text
@@ -357,7 +355,10 @@ compoundset_upload_results is a reference to a hash where the following keys are
 =item Description
 
 CompoundSetFromModel
-obj_ref model_ref
+required:
+string workspace_name
+string model_name
+string compound_set_name
 
 =back
 
@@ -637,7 +638,7 @@ report_ref has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a string
-compoundset_ref has a value which is a CompoundSetUtils.obj_ref
+compound_set_name has a value which is a string
 output_format has a value which is a string
 
 </pre>
@@ -648,7 +649,7 @@ output_format has a value which is a string
 
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a string
-compoundset_ref has a value which is a CompoundSetUtils.obj_ref
+compound_set_name has a value which is a string
 output_format has a value which is a string
 
 
@@ -671,7 +672,7 @@ output_format has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a string
-model_ref has a value which is a CompoundSetUtils.obj_ref
+model_name has a value which is a string
 compound_set_name has a value which is a string
 
 </pre>
@@ -682,7 +683,7 @@ compound_set_name has a value which is a string
 
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a string
-model_ref has a value which is a CompoundSetUtils.obj_ref
+model_name has a value which is a string
 compound_set_name has a value which is a string
 
 

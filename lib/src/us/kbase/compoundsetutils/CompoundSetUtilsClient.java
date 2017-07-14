@@ -186,7 +186,7 @@ public class CompoundSetUtilsClient {
      * <p>Original spec-file function name: compound_set_to_file</p>
      * <pre>
      * CompoundSetToFile
-     * obj_ref compound_set_ref
+     * string compound_set_name
      * string output_format
      * </pre>
      * @param   params   instance of type {@link us.kbase.compoundsetutils.CompoundsetDownloadParams CompoundsetDownloadParams} (original type "compoundset_download_params")
@@ -206,7 +206,10 @@ public class CompoundSetUtilsClient {
      * <p>Original spec-file function name: compound_set_from_model</p>
      * <pre>
      * CompoundSetFromModel
-     * obj_ref model_ref
+     * required:
+     * string workspace_name
+     * string model_name
+     * string compound_set_name
      * </pre>
      * @param   params   instance of type {@link us.kbase.compoundsetutils.CompoundsetFromModelParams CompoundsetFromModelParams} (original type "compoundset_from_model_params")
      * @return   parameter "output" of type {@link us.kbase.compoundsetutils.CompoundsetUploadResults CompoundsetUploadResults} (original type "compoundset_upload_results")
