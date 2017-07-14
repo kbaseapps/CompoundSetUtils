@@ -9,16 +9,16 @@
         "input": null,
         "output": null
     },
-    "parameters": [ 
+    "parameters": [
         {
-            "id": "staging_file_path",
-            "optional": false,
-            "advanced": false,
-            "allow_multiple": false,
-            "default_values": [ "" ],
-            "field_type": "text",
-            "text_options": {
-                "valid_ws_types": [ ]
+            "id" : "model_ref",
+            "optional" : false,
+            "advanced" : false,
+            "allow_multiple" : false,
+            "default_values" : [ "" ],
+            "field_type" : "text",
+            "text_options" : {
+              "valid_ws_types" : [ "KBaseFBA.FBAModel" ]
             }
         },
         {
@@ -38,15 +38,15 @@
         "service-mapping": {
             "url": "",
             "name": "CompoundSetUtils",
-            "method": "compound_set_from_file",
+            "method": "compound_set_from_model",
             "input_mapping": [
                 {
                     "narrative_system_variable": "workspace",
                     "target_property": "workspace_name"
                 },
                 {
-                    "input_parameter": "staging_file_path",
-                    "target_property": "staging_file_path"
+                    "input_parameter": "model_ref",
+                    "target_property": "model_ref"
                 },
                 {
                     "input_parameter": "compound_set_name",

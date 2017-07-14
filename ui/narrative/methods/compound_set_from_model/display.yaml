@@ -1,0 +1,49 @@
+#
+# define display information
+#
+name: Export CompoundSet to File
+
+tooltip: |
+    This method genrerate a file of the specified format from CompoundSet
+
+screenshots: []
+
+icon: icon.png
+
+#
+# define a set of similar methods that might be useful to the user
+#
+suggestions:
+    apps:
+        related:
+            []
+        next:
+            []
+    methods:
+        related:
+            []
+        next:
+            []
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    model_ref :
+        ui-name : |
+            CompoundSet
+        short-hint : |
+            The Compound Set to export.
+        long-hint  : |
+            The Compound Set to export.
+    compound_set_name :
+        ui-name : |
+            Compound Set Name
+        short-hint : |
+            The name for the compound set to be produced.
+        long-hint  : |
+            The name for the compound set to be produced.
+
+
+description : |
+    <p>This app builds a CompoundSet from compounds in a Metabolic Model.</p>

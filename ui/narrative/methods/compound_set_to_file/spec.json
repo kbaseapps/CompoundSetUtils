@@ -9,48 +9,60 @@
         "input": null,
         "output": null
     },
-    "parameters": [ 
+    "parameters": [
         {
-            "id": "staging_file_path",
-            "optional": false,
-            "advanced": false,
-            "allow_multiple": false,
-            "default_values": [ "" ],
-            "field_type": "text",
-            "text_options": {
-                "valid_ws_types": [ ]
-            }
-        },
-        {
-            "id" : "compound_set_name",
+            "id" : "compoundset_ref",
             "optional" : false,
             "advanced" : false,
             "allow_multiple" : false,
             "default_values" : [ "" ],
             "field_type" : "text",
             "text_options" : {
-            "valid_ws_types" : [ "KBaseBiochem.CompoundSet" ],
-            "is_output_name":true
+              "valid_ws_types" : [ "KBa.CompoundSet" ]
             }
-         }
+        },
+        {
+            "id": "output_format",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "tsv" ],
+            "field_type": "dropdown",
+            "dropdown_options": {
+              "options": [
+                {
+                  "value": "tsv",
+                  "display": "Tab-separated values",
+                  "id": "tsv",
+                  "ui_name": "Tab-separated values"
+                },
+                {
+                  "value": "sdf",
+                  "display": "Structured Data Format (SDF)",
+                  "id": "sdf",
+                  "ui_name": "Structured Data Format (SDF)"
+                }
+              ]
+            }
+        }
     ],
     "behavior": {
         "service-mapping": {
             "url": "",
             "name": "CompoundSetUtils",
-            "method": "compound_set_from_file",
+            "method": "compound_set_to_file",
             "input_mapping": [
                 {
                     "narrative_system_variable": "workspace",
                     "target_property": "workspace_name"
                 },
                 {
-                    "input_parameter": "staging_file_path",
-                    "target_property": "staging_file_path"
+                    "input_parameter": "compoundset_ref",
+                    "target_property": "compoundset_ref"
                 },
                 {
-                    "input_parameter": "compound_set_name",
-                    "target_property": "compound_set_name"
+                    "input_parameter": "output_format",
+                    "target_property": "output_format"
                 }
             ],
             "output_mapping": [
