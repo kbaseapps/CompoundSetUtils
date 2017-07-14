@@ -41,15 +41,15 @@ Contains tools for import & export of compound sets
     def _save_to_ws_and_report(self, params, compoundset):
         """Save compound set to the workspace and make report"""
         compoundset_ref = self.ws_client.save_objects(
-            {'id': params['workspace_name'],
+            {'workspace': params['workspace_name'],
              "objects": [{
-                 "type": "Biochemistry.CompoundSet",
+                 "type": "KBaseBiochem.CompoundSet",
                  "data": compoundset,
                  "name": params['workspace_name']
              }]})[0]
 
         report_params = {
-            'objects_created': [compoundset_ref],
+            #'objects_created': [compoundset_ref],
             'message': 'Imported %s as %s' % (params['staging_file_path'],
                                               compoundset_ref),
             'workspace_name': params['workspace_name'],
@@ -75,7 +75,6 @@ Contains tools for import & export of compound sets
         self.callback_url = os.environ['SDK_CALLBACK_URL']
         self.ws_url = config['workspace-url']
         self.ws_client = Workspace(self.ws_url)
-        self.token = config['KB_AUTH_TOKEN']
         self.dfu = DataFileUtil(self.callback_url)
         #END_CONSTRUCTOR
         pass
@@ -103,12 +102,20 @@ Contains tools for import & export of compound sets
         ).get('copy_file_path')
 
         ext = os.path.splitext(scratch_file_path)[1]
-        if ext == 'sdf':
-            compoundset = parse.read_sdf(scratch_file_path)
-        elif ext == 'tsv':
-            compoundset = parse.read_tsv(scratch_file_path)
+        file_name = os.path.basename(scratch_file_path)
+        if ext == '.sdf':
+            compounds = parse.read_sdf(scratch_file_path)
+        elif ext == '.tsv':
+            compounds = parse.read_tsv(scratch_file_path)
         else:
             raise ValueError('Invalid input file type. Expects .tsv or .sdf')
+
+        compoundset = {
+            'id': params['compound_set_name'],
+            'name': params['compound_set_name'],
+            'description': 'Compound Set produced from %s' % file_name,
+            'compounds': compounds,
+        }
 
         output = self._save_to_ws_and_report(params, compoundset)
 
