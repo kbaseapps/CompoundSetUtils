@@ -20,6 +20,7 @@ from CompoundSetUtils.authclient import KBaseAuth as _KBaseAuth
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from mock import patch
 import shutil
+import pickle
 
 
 class CompoundSetUtilsTest(unittest.TestCase):
@@ -86,6 +87,15 @@ class CompoundSetUtilsTest(unittest.TestCase):
         shutil.copy('/kb/module/test/'+inpath, scratch+inpath)
         return {'copy_file_path': scratch+inpath}
 
+    def save_compound_set(self):
+        comp_set = pickle.load(open('/kb/module/test/compound_set.pkl', 'rb'))
+        ws_obj = {"type": "KBaseBiochem.CompoundSet", "data": comp_set,
+                  "name": comp_set['name']}
+        info = self.getWsClient().save_objects({'workspace': self.getWsName(),
+                                                "objects": [ws_obj]})[0]
+        compoundset_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+        return compoundset_ref
+
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     @patch.object(DataFileUtil, "download_staging_file",
                   new=fake_staging_download)
@@ -111,3 +121,17 @@ class CompoundSetUtilsTest(unittest.TestCase):
                   'staging_file_path': 'test_compounds.sdf',
                   'compound_set_name': 'sdf_set'}
         ret = self.getImpl().compound_set_from_file(self.getContext(), params)
+
+    def test_compound_set_to_file_tsv(self):
+        compoundset_ref = self.save_compound_set()
+        params = {'workspace_name': self.getWsName(),
+                  'compoundset_ref': compoundset_ref,
+                  'output_format': 'tsv'}
+        ret = self.getImpl().compound_set_to_file(self.getContext(), params)
+
+    def test_compound_set_to_file_sdf(self):
+        compoundset_ref = self.save_compound_set()
+        params = {'workspace_name': self.getWsName(),
+                  'compoundset_ref': compoundset_ref,
+                  'output_format': 'sdf'}
+        ret = self.getImpl().compound_set_to_file(self.getContext(), params)

@@ -59,9 +59,26 @@ def parse_model(model):
     raise NotImplementedError
 
 
-def write_tsv(compound_set):
-    raise NotImplementedError
+def write_tsv(compound_set, outfile_path):
+    cols = ['id', 'name', 'smiles', 'inchikey', 'charge', 'formula', 'mass',
+            'exactmass', 'compound_ref', 'modelcompound_ref', 'deltag',
+            'deltagerr']
+    writer = csv.DictWriter(open(outfile_path, 'w'), cols, dialect='excel-tab',
+                            extrasaction='ignore')
+    writer.writeheader()
+    for compound in compound_set['compounds']:
+        writer.writerow(compound)
+    return outfile_path
 
 
-def write_sdf(compound_set):
-    raise NotImplementedError
+def write_sdf(compound_set, outfile_path):
+    no_export = {'smiles', 'fingerprints', 'dblinks'}
+    writer = AllChem.SDWriter(open(outfile_path, 'w'))
+    for compound in compound_set['compounds']:
+        mol = AllChem.MolFromSmiles(compound['smiles'])
+        for prop, val in compound.items():
+            if prop in no_export:
+                continue
+            mol.SetProp(str(prop), str(val))
+        writer.write(mol)
+    return outfile_path

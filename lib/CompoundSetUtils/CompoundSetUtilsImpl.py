@@ -5,6 +5,7 @@ from Workspace.WorkspaceClient import Workspace
 from KBaseReport.KBaseReportClient import KBaseReport
 import CompoundSetUtils.compound_parsing as parse
 import os
+import pickle
 #END_HEADER
 
 
@@ -40,14 +41,14 @@ Contains tools for import & export of compound sets
 
     def _save_to_ws_and_report(self, params, compoundset):
         """Save compound set to the workspace and make report"""
-        compoundset_ref = self.ws_client.save_objects(
+        info = self.ws_client.save_objects(
             {'workspace': params['workspace_name'],
              "objects": [{
                  "type": "KBaseBiochem.CompoundSet",
                  "data": compoundset,
                  "name": params['workspace_name']
              }]})[0]
-
+        compoundset_ref = "%s/%s/%s" % (info[6], info[0], info[4])
         report_params = {
             #'objects_created': [compoundset_ref],
             'message': 'Imported %s as %s' % (params['staging_file_path'],
@@ -149,10 +150,11 @@ Contains tools for import & export of compound sets
         compoundset = self.ws_client.get_objects2({'objects': [
             {'ref': params['compoundset_ref']}]})['data'][0]['data']
         ext = params['output_format']
+        out = "%s/%s.%s" % (self.scratch, compoundset['name'], ext)
         if ext == 'sdf':
-            outfile_path = parse.write_sdf(compoundset)
+            outfile_path = parse.write_sdf(compoundset, out)
         elif ext == 'tsv':
-            outfile_path = parse.write_tsv(compoundset)
+            outfile_path = parse.write_tsv(compoundset, out)
         else:
             raise ValueError('Invalid output file type. Expects tsv or sdf')
 
