@@ -1,4 +1,4 @@
-test_local/
+test_local
 .idea/
 *.pyc
 sdk.cfg
