@@ -2,3 +2,4 @@ test_local
 .idea/
 *.pyc
 sdk.cfg
+lib/CompoundSetUtils/CompoundSetUtilsImpl.py.bak*

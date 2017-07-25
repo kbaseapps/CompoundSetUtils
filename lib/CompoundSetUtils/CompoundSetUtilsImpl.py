@@ -26,8 +26,8 @@ Contains tools for import & export of compound sets
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "git@github.com:JamesJeffryes/CompoundSetUtils.git"
-    GIT_COMMIT_HASH = "0cc47a61a463f100590aa92f7fdaa714cbd6fa0d"
+    GIT_URL = "https://github.com/kbaseapps/CompoundSetUtils.git"
+    GIT_COMMIT_HASH = "53bac077a8efaaea9ead90d5557b1af1c0b23394"
 
     #BEGIN_CLASS_HEADER
     @staticmethod
@@ -71,7 +71,7 @@ Contains tools for import & export of compound sets
                   'report_ref': report_info['ref'],
                   'compoundset_ref': compoundset_ref}
         return output
-        #END_CLASS_HEADER
+    #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
     # be found
