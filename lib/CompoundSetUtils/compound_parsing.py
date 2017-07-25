@@ -47,7 +47,7 @@ def read_tsv(file_path, structure_field='structure'):
 
 def read_sdf(file_path):
     file_name = os.path.splitext(os.path.basename(file_path))[0]
-    sdf = AllChem.SDMolSupplier(file_path)
+    sdf = AllChem.SDMolSupplier(file_path.encode('ascii', 'ignore'))
     compounds = []
     for i, mol in enumerate(sdf):
         comp = {'id': '%s_%s' %(file_name, i+1), 'name': mol.GetProp("_Name")}
