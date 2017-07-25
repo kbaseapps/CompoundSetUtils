@@ -26,7 +26,7 @@ Contains tools for import & export of compound sets
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/kbaseapps/CompoundSetUtils.git"
+    GIT_URL = "git@github.com:kbaseapps/CompoundSetUtils.git"
     GIT_COMMIT_HASH = "53bac077a8efaaea9ead90d5557b1af1c0b23394"
 
     #BEGIN_CLASS_HEADER
@@ -236,6 +236,58 @@ Contains tools for import & export of compound sets
         # At some point might do deeper type checking...
         if not isinstance(output, dict):
             raise ValueError('Method compound_set_from_model return value ' +
+                             'output is not type dict as required.')
+        # return the results
+        return [output]
+
+    def export_compoundset_as_tsv(self, ctx, params):
+        """
+        :param params: instance of type "ExportParams" (input and output
+           structure functions for standard downloaders) -> structure:
+           parameter "input_ref" of String
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        # ctx is the context object
+        # return variables are: output
+        #BEGIN export_compoundset_as_tsv
+
+        compoundset = self.ws_client.get_objects2({'objects': [
+            {'ref': params['input_ref']}]})['data'][0]['data']
+        outfile_path = parse.write_tsv(compoundset, self.scratch+"/temp.tsv")
+        shock_id = self.dfu.file_to_shock({'file_path': outfile_path})
+        output = {'shock_id': shock_id}
+
+        #END export_compoundset_as_tsv
+
+        # At some point might do deeper type checking...
+        if not isinstance(output, dict):
+            raise ValueError('Method export_compoundset_as_tsv return value ' +
+                             'output is not type dict as required.')
+        # return the results
+        return [output]
+
+    def export_compoundset_as_sdf(self, ctx, params):
+        """
+        :param params: instance of type "ExportParams" (input and output
+           structure functions for standard downloaders) -> structure:
+           parameter "input_ref" of String
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        # ctx is the context object
+        # return variables are: output
+        #BEGIN export_compoundset_as_sdf
+        compoundset = self.ws_client.get_objects2({'objects': [
+            {'ref': params['input_ref']}]})['data'][0]['data']
+        outfile_path = parse.write_sdf(compoundset, self.scratch + "/temp.sdf")
+        shock_id = self.dfu.file_to_shock({'file_path': outfile_path})
+        output = {'shock_id': shock_id}
+        #END export_compoundset_as_sdf
+
+        # At some point might do deeper type checking...
+        if not isinstance(output, dict):
+            raise ValueError('Method export_compoundset_as_sdf return value ' +
                              'output is not type dict as required.')
         # return the results
         return [output]

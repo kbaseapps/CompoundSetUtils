@@ -345,6 +345,14 @@ class Application(object):
                              name='CompoundSetUtils.compound_set_from_model',
                              types=[dict])
         self.method_authentication['CompoundSetUtils.compound_set_from_model'] = 'required'  # noqa
+        self.rpc_service.add(impl_CompoundSetUtils.export_compoundset_as_tsv,
+                             name='CompoundSetUtils.export_compoundset_as_tsv',
+                             types=[dict])
+        self.method_authentication['CompoundSetUtils.export_compoundset_as_tsv'] = 'required'  # noqa
+        self.rpc_service.add(impl_CompoundSetUtils.export_compoundset_as_sdf,
+                             name='CompoundSetUtils.export_compoundset_as_sdf',
+                             types=[dict])
+        self.method_authentication['CompoundSetUtils.export_compoundset_as_sdf'] = 'required'  # noqa
         self.rpc_service.add(impl_CompoundSetUtils.status,
                              name='CompoundSetUtils.status',
                              types=[dict])

@@ -224,6 +224,40 @@ public class CompoundSetUtilsClient {
         return res.get(0);
     }
 
+    /**
+     * <p>Original spec-file function name: export_compoundset_as_tsv</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.compoundsetutils.ExportParams ExportParams}
+     * @return   parameter "output" of type {@link us.kbase.compoundsetutils.ExportOutput ExportOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public ExportOutput exportCompoundsetAsTsv(ExportParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<ExportOutput>> retType = new TypeReference<List<ExportOutput>>() {};
+        List<ExportOutput> res = caller.jsonrpcCall("CompoundSetUtils.export_compoundset_as_tsv", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: export_compoundset_as_sdf</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.compoundsetutils.ExportParams ExportParams}
+     * @return   parameter "output" of type {@link us.kbase.compoundsetutils.ExportOutput ExportOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public ExportOutput exportCompoundsetAsSdf(ExportParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<ExportOutput>> retType = new TypeReference<List<ExportOutput>>() {};
+        List<ExportOutput> res = caller.jsonrpcCall("CompoundSetUtils.export_compoundset_as_sdf", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};

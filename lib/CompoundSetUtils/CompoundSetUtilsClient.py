@@ -83,6 +83,30 @@ class CompoundSetUtils(object):
             'CompoundSetUtils.compound_set_from_model',
             [params], self._service_ver, context)
 
+    def export_compoundset_as_tsv(self, params, context=None):
+        """
+        :param params: instance of type "ExportParams" (input and output
+           structure functions for standard downloaders) -> structure:
+           parameter "input_ref" of String
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        return self._client.call_method(
+            'CompoundSetUtils.export_compoundset_as_tsv',
+            [params], self._service_ver, context)
+
+    def export_compoundset_as_sdf(self, params, context=None):
+        """
+        :param params: instance of type "ExportParams" (input and output
+           structure functions for standard downloaders) -> structure:
+           parameter "input_ref" of String
+        :returns: instance of type "ExportOutput" -> structure: parameter
+           "shock_id" of String
+        """
+        return self._client.call_method(
+            'CompoundSetUtils.export_compoundset_as_sdf',
+            [params], self._service_ver, context)
+
     def status(self, context=None):
         return self._client.call_method('CompoundSetUtils.status',
                                         [], self._service_ver, context)
