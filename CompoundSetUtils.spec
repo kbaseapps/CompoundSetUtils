@@ -62,4 +62,19 @@ module CompoundSetUtils {
 
     funcdef compound_set_from_model(compoundset_from_model_params params)
         returns (compoundset_upload_results output) authentication required;
+
+    /*  input and output structure functions for standard downloaders */
+    typedef structure {
+        string input_ref;
+    } ExportParams;
+
+    typedef structure {
+        string shock_id;
+    } ExportOutput;
+
+    funcdef export_compoundset_as_tsv(ExportParams params)
+        returns (ExportOutput output) authentication required;
+
+    funcdef export_compoundset_as_sdf(ExportParams params)
+        returns (ExportOutput output) authentication required;
 };
