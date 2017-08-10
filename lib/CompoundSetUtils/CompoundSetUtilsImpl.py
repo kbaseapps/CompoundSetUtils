@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
 from DataFileUtil.DataFileUtilClient import DataFileUtil
-from Workspace.WorkspaceClient import Workspace
 from KBaseReport.KBaseReportClient import KBaseReport
 import CompoundSetUtils.compound_parsing as parse
 import os
@@ -39,16 +38,9 @@ Contains tools for import & export of compound sets
             if param not in in_params or not in_params[param]:
                 raise ValueError('{} parameter is required'.format(param))
 
-    def _save_to_ws_and_report(self, ctx, method, workspace, source, compoundset):
+    def _save_to_ws_and_report(self, ctx, workspace, source, compoundset):
         """Save compound set to the workspace and make report"""
-        provenance = [{}]
-        if 'provenance' in ctx:
-            provenance = ctx['provenance']
-        if 'model' in method:
-            provenance[0]['input_ws_objects'] = workspace + '/' + source
-        provenance[0]['service'] = 'CompoundSetUtils'
-        provenance[0]['method'] = method
-        info = self.ws_client.save_objects(
+        info = self.dfu.save_objects(
             {'workspace': workspace,
              "objects": [{
                  "type": "KBaseBiochem.CompoundSet",
@@ -59,7 +51,7 @@ Contains tools for import & export of compound sets
         report_params = {
             'objects_created': [{'ref': compoundset_ref,
                                  'description': 'Compound Set'}],
-            'message': 'Imported %s as %s' % (source, compoundset_ref),
+            'message': 'Imported %s as %s' % (source, info[1]),
             'workspace_name': workspace,
             'report_object_name': 'compound_set_creation_report'
         }
@@ -80,12 +72,9 @@ Contains tools for import & export of compound sets
         self.config = config
         self.scratch = config['scratch']
         self.callback_url = os.environ['SDK_CALLBACK_URL']
-        self.ws_url = config['workspace-url']
-        self.ws_client = Workspace(self.ws_url)
         self.dfu = DataFileUtil(self.callback_url)
         #END_CONSTRUCTOR
         pass
-
 
     def compound_set_from_file(self, ctx, params):
         """
@@ -126,7 +115,7 @@ Contains tools for import & export of compound sets
             'compounds': compounds,
         }
 
-        output = self._save_to_ws_and_report(ctx, 'compound_set_from_file',
+        output = self._save_to_ws_and_report(ctx,
                                              params['workspace_name'],
                                              params['staging_file_path'],
                                              compoundset)
@@ -156,7 +145,7 @@ Contains tools for import & export of compound sets
         #BEGIN compound_set_to_file
         self._check_required_param(params, ['workspace_name', 'compound_set_name',
                                             'output_format'])
-        compoundset = self.ws_client.get_objects2({'objects': [
+        compoundset = self.dfu.get_objects({'objects': [
             {'workspace': params['workspace_name'],
              'name': params['compound_set_name']}]})['data'][0]['data']
         ext = params['output_format']
@@ -186,8 +175,7 @@ Contains tools for import & export of compound sets
         report_client = KBaseReport(self.callback_url)
         report_info = report_client.create_extended_report(report_params)
         output = {'report_name': report_info['name'],
-                  'report_ref': report_info['ref'],
-                  }
+                  'report_ref': report_info['ref']}
         #END compound_set_to_file
 
         # At some point might do deeper type checking...
@@ -216,7 +204,7 @@ Contains tools for import & export of compound sets
         #BEGIN compound_set_from_model
         self._check_required_param(params, ['workspace_name', 'model_name',
                                             'compound_set_name'])
-        model = self.ws_client.get_objects2({'objects': [
+        model = self.dfu.get_objects({'objects': [
             {'workspace': params['workspace_name'],
              'name': params['model_name']}]})['data'][0]['data']
         compounds, undef = parse.parse_model(model)
@@ -228,8 +216,7 @@ Contains tools for import & export of compound sets
             'compounds': compounds,
         }
 
-        output = self._save_to_ws_and_report(ctx, 'compound_set_from_model',
-                                             params['workspace_name'],
+        output = self._save_to_ws_and_report(ctx, params['workspace_name'],
                                              params['model_name'], compoundset)
         #END compound_set_from_model
 
@@ -252,7 +239,7 @@ Contains tools for import & export of compound sets
         # return variables are: output
         #BEGIN export_compoundset_as_tsv
 
-        compoundset = self.ws_client.get_objects2({'objects': [
+        compoundset = self.dfu.get_objects({'objects': [
             {'ref': params['input_ref']}]})['data'][0]['data']
         outfile_path = parse.write_tsv(compoundset, self.scratch+"/temp.tsv")
         shock_id = self.dfu.file_to_shock({'file_path': outfile_path})
@@ -278,7 +265,7 @@ Contains tools for import & export of compound sets
         # ctx is the context object
         # return variables are: output
         #BEGIN export_compoundset_as_sdf
-        compoundset = self.ws_client.get_objects2({'objects': [
+        compoundset = self.dfu.get_objects({'objects': [
             {'ref': params['input_ref']}]})['data'][0]['data']
         outfile_path = parse.write_sdf(compoundset, self.scratch + "/temp.sdf")
         shock_id = self.dfu.file_to_shock({'file_path': outfile_path})
