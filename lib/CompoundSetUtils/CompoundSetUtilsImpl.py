@@ -242,8 +242,8 @@ Contains tools for import & export of compound sets
         compoundset = self.dfu.get_objects({'objects': [
             {'ref': params['input_ref']}]})['data'][0]['data']
         outfile_path = parse.write_tsv(compoundset, self.scratch+"/temp.tsv")
-        shock_id = self.dfu.file_to_shock({'file_path': outfile_path})
-        output = {'shock_id': shock_id}
+        handle = self.dfu.file_to_shock({'file_path': outfile_path})
+        output = {'shock_id': handle['shock_id']}
 
         #END export_compoundset_as_tsv
 
@@ -268,8 +268,8 @@ Contains tools for import & export of compound sets
         compoundset = self.dfu.get_objects({'objects': [
             {'ref': params['input_ref']}]})['data'][0]['data']
         outfile_path = parse.write_sdf(compoundset, self.scratch + "/temp.sdf")
-        shock_id = self.dfu.file_to_shock({'file_path': outfile_path})
-        output = {'shock_id': shock_id}
+        handle = self.dfu.file_to_shock({'file_path': outfile_path})
+        output = {'shock_id': handle['shock_id']}
         #END export_compoundset_as_sdf
 
         # At some point might do deeper type checking...

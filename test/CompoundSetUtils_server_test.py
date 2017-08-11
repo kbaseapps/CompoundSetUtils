@@ -93,7 +93,8 @@ class CompoundSetUtilsTest(unittest.TestCase):
                   "name": comp_set['name']}
         info = self.getWsClient().save_objects({'workspace': self.getWsName(),
                                                 "objects": [ws_obj]})[0]
-        return comp_set['name']
+        compoundset_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+        return comp_set['name'], compoundset_ref
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     @patch.object(DataFileUtil, "download_staging_file",
@@ -103,6 +104,7 @@ class CompoundSetUtilsTest(unittest.TestCase):
                   'staging_file_path': 'test_compounds.tsv',
                   'compound_set_name': 'sdf_set'}
         ret = self.getImpl().compound_set_from_file(self.getContext(), params)
+        assert ret and ('report_name' in ret)
 
     @patch.object(DataFileUtil, "download_staging_file",
                   new=fake_staging_download)
@@ -111,20 +113,23 @@ class CompoundSetUtilsTest(unittest.TestCase):
                   'staging_file_path': 'test_compounds.sdf',
                   'compound_set_name': 'sdf_set'}
         ret = self.getImpl().compound_set_from_file(self.getContext(), params)
+        assert ret and ('report_name' in ret)
 
     def test_compound_set_to_file_tsv(self):
-        compoundset_ref = self.save_compound_set()
+        compoundset_name = self.save_compound_set()[0]
         params = {'workspace_name': self.getWsName(),
-                  'compound_set_name': compoundset_ref,
+                  'compound_set_name': compoundset_name,
                   'output_format': 'tsv'}
         ret = self.getImpl().compound_set_to_file(self.getContext(), params)
+        assert ret and ('report_name' in ret)
 
     def test_compound_set_to_file_sdf(self):
-        compoundset_ref = self.save_compound_set()
+        compoundset_name = self.save_compound_set()[0]
         params = {'workspace_name': self.getWsName(),
-                  'compound_set_name': compoundset_ref,
+                  'compound_set_name': compoundset_name,
                   'output_format': 'sdf'}
         ret = self.getImpl().compound_set_to_file(self.getContext(), params)
+        assert ret and ('report_name' in ret)
 
     def test_compound_set_from_model(self):
         model = json.load(open('/kb/module/test/iMR1_799.json'))
@@ -136,3 +141,14 @@ class CompoundSetUtilsTest(unittest.TestCase):
                   'model_name': model['name'],
                   'compound_set_name': 'model_set'}
         ret = self.getImpl().compound_set_from_model(self.getContext(), params)
+        assert ret and ('report_name' in ret)
+
+    def test_compound_set_export(self):
+        compoundset_ref = self.save_compound_set()[1]
+        ret1 = self.getImpl().export_compoundset_as_tsv(self.getContext(), {'input_ref': compoundset_ref})
+        assert ret1 and isinstance(ret1, str)
+        ret2 = self.getImpl().export_compoundset_as_sdf(self.getContext(), {'input_ref': compoundset_ref})
+        assert ret2 and isinstance(ret2, str)
+
+
+
