@@ -4,7 +4,7 @@ from DataFileUtil.DataFileUtilClient import DataFileUtil
 from KBaseReport.KBaseReportClient import KBaseReport
 import CompoundSetUtils.compound_parsing as parse
 import os
-import pickle
+import uuid
 #END_HEADER
 
 
@@ -30,18 +30,22 @@ Contains tools for import & export of compound sets
 
     #BEGIN_CLASS_HEADER
     @staticmethod
-    def _check_required_param(in_params, param_list):
+    def _check_param(in_params, req_param, opt_param=list()):
         """
         Check if each of the params in the list are in the input params
         """
-        for param in param_list:
-            if param not in in_params or not in_params[param]:
+        for param in req_param:
+            if param not in in_params:
                 raise ValueError('{} parameter is required'.format(param))
+        defined_param = set(req_param+opt_param)
+        for param in in_params:
+            if param not in defined_param:
+                print("WARNING: received unexpected parameter {}".format(param))
 
-    def _save_to_ws_and_report(self, ctx, workspace, source, compoundset):
+    def _save_to_ws_and_report(self, ws_id, source, compoundset):
         """Save compound set to the workspace and make report"""
         info = self.dfu.save_objects(
-            {'workspace': workspace,
+            {'id': ws_id,
              "objects": [{
                  "type": "KBaseBiochem.CompoundSet",
                  "data": compoundset,
@@ -52,7 +56,7 @@ Contains tools for import & export of compound sets
             'objects_created': [{'ref': compoundset_ref,
                                  'description': 'Compound Set'}],
             'message': 'Imported %s as %s' % (source, info[1]),
-            'workspace_name': workspace,
+            'workspace_name': info[7],
             'report_object_name': 'compound_set_creation_report'
         }
 
@@ -62,6 +66,27 @@ Contains tools for import & export of compound sets
         output = {'report_name': report_info['name'],
                   'report_ref': report_info['ref'],
                   'compoundset_ref': compoundset_ref}
+        return output
+
+    def _export_compound_set(self, ref, file_type):
+        print("Exporting {} as {}".format(ref, file_type))
+        compoundset = self.dfu.get_objects(
+            {'object_refs': [ref]}
+        )['data'][0]['data']
+        temp_dir = "{}/{}".format(self.scratch, uuid.uuid4())
+        os.mkdir(temp_dir)
+        out_dir = "{}/{}".format(temp_dir, compoundset['name'])
+        os.mkdir(out_dir)
+        target = "{}/{}.{}".format(out_dir, compoundset['name'], file_type)
+        if file_type == 'tsv':
+            parse.write_tsv(compoundset, target)
+        elif file_type == 'sdf':
+            parse.write_sdf(compoundset, target)
+        else:
+            raise ValueError("Bad file_type: {}".format(file_type))
+        handle = self.dfu.package_for_download(
+            {'file_path': out_dir, 'ws_refs': [ref]})
+        output = {'shock_id': handle['shock_id']}
         return output
     #END_CLASS_HEADER
 
@@ -91,9 +116,8 @@ Contains tools for import & export of compound sets
         # ctx is the context object
         # return variables are: output
         #BEGIN compound_set_from_file
-        self._check_required_param(params, ['workspace_name',
-                                            'staging_file_path',
-                                            'compound_set_name'])
+        self._check_param(params, ['workspace_id', 'staging_file_path',
+                                   'compound_set_name'])
         scratch_file_path = self.dfu.download_staging_file(
             {'staging_file_subdir_path': params['staging_file_path']}
         ).get('copy_file_path')
@@ -115,8 +139,7 @@ Contains tools for import & export of compound sets
             'compounds': compounds,
         }
 
-        output = self._save_to_ws_and_report(ctx,
-                                             params['workspace_name'],
+        output = self._save_to_ws_and_report(params['workspace_id'],
                                              params['staging_file_path'],
                                              compoundset)
         #END compound_set_from_file
@@ -143,11 +166,12 @@ Contains tools for import & export of compound sets
         # ctx is the context object
         # return variables are: output
         #BEGIN compound_set_to_file
-        self._check_required_param(params, ['workspace_name', 'compound_set_name',
-                                            'output_format'])
-        compoundset = self.dfu.get_objects({'objects': [
-            {'workspace': params['workspace_name'],
-             'name': params['compound_set_name']}]})['data'][0]['data']
+        self._check_param(params, ['compound_set_ref', 'output_format'])
+        ret = self.dfu.get_objects(
+            {'object_refs': [params['compound_set_ref']]}
+        )['data'][0]
+        workspace_name = ret['info'][7]
+        compoundset = ret['data']
         ext = params['output_format']
         out = "%s/%s.%s" % (self.scratch, compoundset['name'], ext)
         if ext == 'sdf':
@@ -163,11 +187,10 @@ Contains tools for import & export of compound sets
                          'description': 'A compound set in %s format' % ext}]
 
         report_params = {
-            'objects_created': [],
             'message': 'Converted %s compound set to %s format.' % (
-                params['compound_set_name'], params['output_format']),
+                compoundset['name'], params['output_format']),
             'file_links': report_files,
-            'workspace_name': params['workspace_name'],
+            'workspace_name': workspace_name,
             'report_object_name': 'compound_set_download_report'
         }
 
@@ -202,11 +225,11 @@ Contains tools for import & export of compound sets
         # ctx is the context object
         # return variables are: output
         #BEGIN compound_set_from_model
-        self._check_required_param(params, ['workspace_name', 'model_name',
-                                            'compound_set_name'])
-        model = self.dfu.get_objects({'objects': [
-            {'workspace': params['workspace_name'],
-             'name': params['model_name']}]})['data'][0]['data']
+        self._check_param(params, ['workspace_id', 'model_ref',
+                                   'compound_set_name'])
+        model = self.dfu.get_objects(
+            {'object_refs': [params['model_ref']]}
+        )['data'][0]['data']
         compounds, undef = parse.parse_model(model)
         compoundset = {
             'id': params['compound_set_name'],
@@ -216,8 +239,8 @@ Contains tools for import & export of compound sets
             'compounds': compounds,
         }
 
-        output = self._save_to_ws_and_report(ctx, params['workspace_name'],
-                                             params['model_name'], compoundset)
+        output = self._save_to_ws_and_report(params['workspace_id'],
+                                             model['name'], compoundset)
         #END compound_set_from_model
 
         # At some point might do deeper type checking...
@@ -238,13 +261,7 @@ Contains tools for import & export of compound sets
         # ctx is the context object
         # return variables are: output
         #BEGIN export_compoundset_as_tsv
-
-        compoundset = self.dfu.get_objects({'objects': [
-            {'ref': params['input_ref']}]})['data'][0]['data']
-        outfile_path = parse.write_tsv(compoundset, self.scratch+"/temp.tsv")
-        shock_id = self.dfu.file_to_shock({'file_path': outfile_path})
-        output = {'shock_id': shock_id}
-
+        output = self._export_compound_set(params['input_ref'], 'tsv')
         #END export_compoundset_as_tsv
 
         # At some point might do deeper type checking...
@@ -265,11 +282,7 @@ Contains tools for import & export of compound sets
         # ctx is the context object
         # return variables are: output
         #BEGIN export_compoundset_as_sdf
-        compoundset = self.dfu.get_objects({'objects': [
-            {'ref': params['input_ref']}]})['data'][0]['data']
-        outfile_path = parse.write_sdf(compoundset, self.scratch + "/temp.sdf")
-        shock_id = self.dfu.file_to_shock({'file_path': outfile_path})
-        output = {'shock_id': shock_id}
+        output = self._export_compound_set(params['input_ref'], 'sdf')
         #END export_compoundset_as_sdf
 
         # At some point might do deeper type checking...

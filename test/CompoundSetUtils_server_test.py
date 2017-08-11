@@ -58,21 +58,21 @@ class CompoundSetUtilsTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        if hasattr(cls, 'wsName'):
-            cls.wsClient.delete_workspace({'workspace': cls.wsName})
+        if hasattr(cls, 'wsId'):
+            cls.wsClient.delete_workspace({'id': cls.wsId})
             print('Test workspace was deleted')
 
     def getWsClient(self):
         return self.__class__.wsClient
 
-    def getWsName(self):
-        if hasattr(self.__class__, 'wsName'):
-            return self.__class__.wsName
+    def getWsId(self):
+        if hasattr(self.__class__, 'wsId'):
+            return self.__class__.wsId
         suffix = int(time.time() * 1000)
         wsName = "test_CompoundSetUtils_" + str(suffix)
         ret = self.getWsClient().create_workspace({'workspace': wsName})  # noqa
-        self.__class__.wsName = wsName
-        return wsName
+        self.__class__.wsId = ret[0]
+        return ret[0]
 
     def getImpl(self):
         return self.__class__.serviceImpl
@@ -91,48 +91,65 @@ class CompoundSetUtilsTest(unittest.TestCase):
         comp_set = pickle.load(open('/kb/module/test/compound_set.pkl', 'rb'))
         ws_obj = {"type": "KBaseBiochem.CompoundSet", "data": comp_set,
                   "name": comp_set['name']}
-        info = self.getWsClient().save_objects({'workspace': self.getWsName(),
+        info = self.getWsClient().save_objects({'id': self.getWsId(),
                                                 "objects": [ws_obj]})[0]
-        return comp_set['name']
+        compoundset_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+        return compoundset_ref
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     @patch.object(DataFileUtil, "download_staging_file",
                   new=fake_staging_download)
     def test_compound_set_from_file_tsv(self):
-        params = {'workspace_name': self.getWsName(),
+        params = {'workspace_id': self.getWsId(),
                   'staging_file_path': 'test_compounds.tsv',
                   'compound_set_name': 'sdf_set'}
-        ret = self.getImpl().compound_set_from_file(self.getContext(), params)
+        ret = self.getImpl().compound_set_from_file(self.getContext(), params)[0]
+        assert ret and ('report_name' in ret)
 
     @patch.object(DataFileUtil, "download_staging_file",
                   new=fake_staging_download)
     def test_compound_set_from_file_sdf(self):
-        params = {'workspace_name': self.getWsName(),
+        params = {'workspace_id': self.getWsId(),
                   'staging_file_path': 'test_compounds.sdf',
                   'compound_set_name': 'sdf_set'}
-        ret = self.getImpl().compound_set_from_file(self.getContext(), params)
+        ret = self.getImpl().compound_set_from_file(self.getContext(), params)[0]
+        assert ret and ('report_name' in ret)
 
     def test_compound_set_to_file_tsv(self):
         compoundset_ref = self.save_compound_set()
-        params = {'workspace_name': self.getWsName(),
-                  'compound_set_name': compoundset_ref,
+        params = {'compound_set_ref': compoundset_ref,
                   'output_format': 'tsv'}
-        ret = self.getImpl().compound_set_to_file(self.getContext(), params)
+        ret = self.getImpl().compound_set_to_file(self.getContext(), params)[0]
+        assert ret and ('report_name' in ret)
 
     def test_compound_set_to_file_sdf(self):
         compoundset_ref = self.save_compound_set()
-        params = {'workspace_name': self.getWsName(),
-                  'compound_set_name': compoundset_ref,
+        params = {'compound_set_ref': compoundset_ref,
                   'output_format': 'sdf'}
-        ret = self.getImpl().compound_set_to_file(self.getContext(), params)
+        ret = self.getImpl().compound_set_to_file(self.getContext(), params)[0]
+        assert ret and ('report_name' in ret)
 
     def test_compound_set_from_model(self):
         model = json.load(open('/kb/module/test/iMR1_799.json'))
         ws_obj = {"type": "KBaseFBA.FBAModel", "data": model,
                   "name": model['name']}
-        info = self.getWsClient().save_objects({'workspace': self.getWsName(),
+        info = self.getWsClient().save_objects({'id': self.getWsId(),
                                                 "objects": [ws_obj]})[0]
-        params = {'workspace_name': self.getWsName(),
-                  'model_name': model['name'],
+        model_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+        params = {'workspace_id': self.getWsId(),
+                  'model_ref': model_ref,
                   'compound_set_name': 'model_set'}
-        ret = self.getImpl().compound_set_from_model(self.getContext(), params)
+        ret = self.getImpl().compound_set_from_model(self.getContext(), params)[0]
+        assert ret and ('report_name' in ret)
+
+    def test_compound_set_export(self):
+        compoundset_ref = self.save_compound_set()
+        ret1 = self.getImpl().export_compoundset_as_tsv(
+            self.getContext(), {'input_ref': compoundset_ref})[0]['shock_id']
+        assert ret1 and ret1.count('-') == 4
+        ret2 = self.getImpl().export_compoundset_as_sdf(
+            self.getContext(), {'input_ref': compoundset_ref})[0]['shock_id']
+        assert ret2 and ret2.count('-') == 4
+
+
+
