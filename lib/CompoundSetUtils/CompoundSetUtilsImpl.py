@@ -4,7 +4,7 @@ from DataFileUtil.DataFileUtilClient import DataFileUtil
 from KBaseReport.KBaseReportClient import KBaseReport
 import CompoundSetUtils.compound_parsing as parse
 import os
-import pickle
+import uuid
 #END_HEADER
 
 
@@ -66,6 +66,27 @@ Contains tools for import & export of compound sets
         output = {'report_name': report_info['name'],
                   'report_ref': report_info['ref'],
                   'compoundset_ref': compoundset_ref}
+        return output
+
+    def _export_compound_set(self, ref, file_type):
+        print("Exporting {} as {}".format(ref, file_type))
+        compoundset = self.dfu.get_objects(
+            {'object_refs': [ref]}
+        )['data'][0]['data']
+        temp_dir = "{}/{}".format(self.scratch, uuid.uuid4())
+        os.mkdir(temp_dir)
+        out_dir = "{}/{}".format(temp_dir, compoundset['name'])
+        os.mkdir(out_dir)
+        target = "{}/{}.{}".format(out_dir, compoundset['name'], file_type)
+        if file_type == 'tsv':
+            parse.write_tsv(compoundset, target)
+        elif file_type == 'sdf':
+            parse.write_sdf(compoundset, target)
+        else:
+            raise ValueError("Bad file_type: {}".format(file_type))
+        handle = self.dfu.package_for_download(
+            {'file_path': out_dir, 'ws_refs': [ref]})
+        output = {'shock_id': handle['shock_id']}
         return output
     #END_CLASS_HEADER
 
@@ -240,13 +261,7 @@ Contains tools for import & export of compound sets
         # ctx is the context object
         # return variables are: output
         #BEGIN export_compoundset_as_tsv
-        compoundset = self.dfu.get_objects(
-            {'object_refs': [params['input_ref']]}
-        )['data'][0]['data']
-        outfile_path = parse.write_tsv(compoundset, self.scratch+"/temp.tsv")
-        handle = self.dfu.file_to_shock({'file_path': outfile_path})
-        output = {'shock_id': handle['shock_id']}
-
+        output = self._export_compound_set(params['input_ref'], 'tsv')
         #END export_compoundset_as_tsv
 
         # At some point might do deeper type checking...
@@ -267,12 +282,7 @@ Contains tools for import & export of compound sets
         # ctx is the context object
         # return variables are: output
         #BEGIN export_compoundset_as_sdf
-        compoundset = self.dfu.get_objects(
-            {'object_refs': [params['input_ref']]}
-        )['data'][0]['data']
-        outfile_path = parse.write_sdf(compoundset, self.scratch + "/temp.sdf")
-        handle = self.dfu.file_to_shock({'file_path': outfile_path})
-        output = {'shock_id': handle['shock_id']}
+        output = self._export_compound_set(params['input_ref'], 'sdf')
         #END export_compoundset_as_sdf
 
         # At some point might do deeper type checking...
