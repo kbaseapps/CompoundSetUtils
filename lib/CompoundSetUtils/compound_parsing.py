@@ -20,7 +20,9 @@ def _make_compound_info(mol_object):
     }
 
 
-def read_tsv(file_path, structure_field='structure'):
+def read_tsv(file_path, structure_field='structure',
+             inchi_path='/kb/module/data/Inchikey_IDs.json'):
+    inchi_dict = json.load(open(inchi_path))
     cols_to_copy = {'name': str, 'deltag': float, 'deltagerr': float}
     file_name = os.path.splitext(os.path.basename(file_path))[0]
     compounds = []
@@ -35,9 +37,11 @@ def read_tsv(file_path, structure_field='structure'):
         if not mol:
             print("Unable to Parse %s" % line[structure_field])
             continue
-
-        comp = {'id': '%s_%s' % (file_name, i + 1)}
-        comp.update(_make_compound_info(mol))
+        comp = _make_compound_info(mol)
+        if comp['inchikey'] in inchi_dict:
+            comp['id'] = inchi_dict[comp['inchikey']]
+        else:
+            comp['id'] = '%s_%s' % (file_name, i + 1)
         for col in cols_to_copy:
             if col in line:
                 comp[col] = cols_to_copy[col](line[col])
@@ -45,13 +49,18 @@ def read_tsv(file_path, structure_field='structure'):
     return compounds
 
 
-def read_sdf(file_path):
+def read_sdf(file_path, inchi_path='/kb/module/data/Inchikey_IDs.json'):
+    inchi_dict = json.load(open(inchi_path))
     file_name = os.path.splitext(os.path.basename(file_path))[0]
     sdf = AllChem.SDMolSupplier(file_path.encode('ascii', 'ignore'))
     compounds = []
     for i, mol in enumerate(sdf):
-        comp = {'id': '%s_%s' %(file_name, i+1), 'name': mol.GetProp("_Name")}
-        comp.update(_make_compound_info(mol))
+        comp = _make_compound_info(mol)
+        comp['name'] = mol.GetProp("_Name")
+        if comp['inchikey'] in inchi_dict:
+            comp['id'] = inchi_dict[comp['inchikey']]
+        else:
+            comp['id'] = '%s_%s' % (file_name, i + 1)
         compounds.append(comp)
     return compounds
 
