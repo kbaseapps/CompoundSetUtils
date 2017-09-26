@@ -9,14 +9,17 @@ comp_keys = {'dblinks', 'deltag', 'smiles', 'fingerprints', 'name', 'id',
 
 
 def test_read_tsv():
-    compounds = compound_parsing.read_tsv('test_compounds.tsv')
+    compounds = compound_parsing.read_tsv('test_compounds.tsv', 'structure',
+                                          '../data/Inchikey_IDs.json')
     assert len(compounds) == 9
     assert not set(compounds[0].keys()) ^ comp_keys
     assert len(compounds[0]['fingerprints']) == 2
+    assert compounds[2]['id'] == 'cpd00939'
+    print(compounds)
 
 
 def test_read_sdf():
-    compounds = compound_parsing.read_sdf('test_compounds.sdf')
+    compounds = compound_parsing.read_sdf('test_compounds.sdf', '../data/Inchikey_IDs.json')
     assert len(compounds) == 10
     assert not set(compounds[0].keys()) ^ (comp_keys - {'deltagerr', 'deltag'})
     assert len(compounds[0]['fingerprints']) == 2
