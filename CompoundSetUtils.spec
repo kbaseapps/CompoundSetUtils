@@ -7,7 +7,7 @@ module CompoundSetUtils {
     typedef string obj_ref;
 
     typedef structure {
-        string workspace_name;
+        string workspace_id;
         string staging_file_path;
         string compound_set_name;
     } compoundset_upload_params;
@@ -32,8 +32,7 @@ module CompoundSetUtils {
     } compoundset_download_results;
 
     typedef structure {
-        string workspace_name;
-        string compound_set_name;
+        string compound_set_ref;
         string output_format;
     } compoundset_download_params;
 
@@ -47,16 +46,16 @@ module CompoundSetUtils {
         returns (compoundset_download_results output) authentication required;
 
     typedef structure {
-        string workspace_name;
-        string model_name;
+        string workspace_id;
+        string model_ref;
         string compound_set_name;
     } compoundset_from_model_params;
 
     /*
         CompoundSetFromModel
         required:
-        string workspace_name
-        string model_name
+        string workspace_id
+        string model_ref
         string compound_set_name
     */
 

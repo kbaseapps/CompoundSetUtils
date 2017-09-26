@@ -123,7 +123,7 @@ sub new
 $params is a CompoundSetUtils.compoundset_upload_params
 $output is a CompoundSetUtils.compoundset_upload_results
 compoundset_upload_params is a reference to a hash where the following keys are defined:
-	workspace_name has a value which is a string
+	workspace_id has a value which is a string
 	staging_file_path has a value which is a string
 	compound_set_name has a value which is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
@@ -141,7 +141,7 @@ obj_ref is a string
 $params is a CompoundSetUtils.compoundset_upload_params
 $output is a CompoundSetUtils.compoundset_upload_results
 compoundset_upload_params is a reference to a hash where the following keys are defined:
-	workspace_name has a value which is a string
+	workspace_id has a value which is a string
 	staging_file_path has a value which is a string
 	compound_set_name has a value which is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
@@ -224,8 +224,7 @@ string staging_file_path
 $params is a CompoundSetUtils.compoundset_download_params
 $output is a CompoundSetUtils.compoundset_download_results
 compoundset_download_params is a reference to a hash where the following keys are defined:
-	workspace_name has a value which is a string
-	compound_set_name has a value which is a string
+	compound_set_ref has a value which is a string
 	output_format has a value which is a string
 compoundset_download_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
@@ -240,8 +239,7 @@ compoundset_download_results is a reference to a hash where the following keys a
 $params is a CompoundSetUtils.compoundset_download_params
 $output is a CompoundSetUtils.compoundset_download_results
 compoundset_download_params is a reference to a hash where the following keys are defined:
-	workspace_name has a value which is a string
-	compound_set_name has a value which is a string
+	compound_set_ref has a value which is a string
 	output_format has a value which is a string
 compoundset_download_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
@@ -322,8 +320,8 @@ string output_format
 $params is a CompoundSetUtils.compoundset_from_model_params
 $output is a CompoundSetUtils.compoundset_upload_results
 compoundset_from_model_params is a reference to a hash where the following keys are defined:
-	workspace_name has a value which is a string
-	model_name has a value which is a string
+	workspace_id has a value which is a string
+	model_ref has a value which is a string
 	compound_set_name has a value which is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
@@ -340,8 +338,8 @@ obj_ref is a string
 $params is a CompoundSetUtils.compoundset_from_model_params
 $output is a CompoundSetUtils.compoundset_upload_results
 compoundset_from_model_params is a reference to a hash where the following keys are defined:
-	workspace_name has a value which is a string
-	model_name has a value which is a string
+	workspace_id has a value which is a string
+	model_ref has a value which is a string
 	compound_set_name has a value which is a string
 compoundset_upload_results is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
@@ -356,8 +354,8 @@ obj_ref is a string
 
 CompoundSetFromModel
 required:
-string workspace_name
-string model_name
+string workspace_id
+string model_ref
 string compound_set_name
 
 =back
@@ -717,7 +715,7 @@ a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-workspace_name has a value which is a string
+workspace_id has a value which is a string
 staging_file_path has a value which is a string
 compound_set_name has a value which is a string
 
@@ -728,7 +726,7 @@ compound_set_name has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-workspace_name has a value which is a string
+workspace_id has a value which is a string
 staging_file_path has a value which is a string
 compound_set_name has a value which is a string
 
@@ -817,8 +815,7 @@ report_ref has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-workspace_name has a value which is a string
-compound_set_name has a value which is a string
+compound_set_ref has a value which is a string
 output_format has a value which is a string
 
 </pre>
@@ -828,8 +825,7 @@ output_format has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-workspace_name has a value which is a string
-compound_set_name has a value which is a string
+compound_set_ref has a value which is a string
 output_format has a value which is a string
 
 
@@ -851,8 +847,8 @@ output_format has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-workspace_name has a value which is a string
-model_name has a value which is a string
+workspace_id has a value which is a string
+model_ref has a value which is a string
 compound_set_name has a value which is a string
 
 </pre>
@@ -862,8 +858,8 @@ compound_set_name has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-workspace_name has a value which is a string
-model_name has a value which is a string
+workspace_id has a value which is a string
+model_ref has a value which is a string
 compound_set_name has a value which is a string
 
 

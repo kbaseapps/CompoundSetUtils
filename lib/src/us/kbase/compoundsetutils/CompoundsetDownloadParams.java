@@ -19,47 +19,29 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "workspace_name",
-    "compound_set_name",
+    "compound_set_ref",
     "output_format"
 })
 public class CompoundsetDownloadParams {
 
-    @JsonProperty("workspace_name")
-    private String workspaceName;
-    @JsonProperty("compound_set_name")
-    private String compoundSetName;
+    @JsonProperty("compound_set_ref")
+    private String compoundSetRef;
     @JsonProperty("output_format")
     private String outputFormat;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("workspace_name")
-    public String getWorkspaceName() {
-        return workspaceName;
+    @JsonProperty("compound_set_ref")
+    public String getCompoundSetRef() {
+        return compoundSetRef;
     }
 
-    @JsonProperty("workspace_name")
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
+    @JsonProperty("compound_set_ref")
+    public void setCompoundSetRef(String compoundSetRef) {
+        this.compoundSetRef = compoundSetRef;
     }
 
-    public CompoundsetDownloadParams withWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
-        return this;
-    }
-
-    @JsonProperty("compound_set_name")
-    public String getCompoundSetName() {
-        return compoundSetName;
-    }
-
-    @JsonProperty("compound_set_name")
-    public void setCompoundSetName(String compoundSetName) {
-        this.compoundSetName = compoundSetName;
-    }
-
-    public CompoundsetDownloadParams withCompoundSetName(String compoundSetName) {
-        this.compoundSetName = compoundSetName;
+    public CompoundsetDownloadParams withCompoundSetRef(String compoundSetRef) {
+        this.compoundSetRef = compoundSetRef;
         return this;
     }
 
@@ -90,7 +72,7 @@ public class CompoundsetDownloadParams {
 
     @Override
     public String toString() {
-        return ((((((((("CompoundsetDownloadParams"+" [workspaceName=")+ workspaceName)+", compoundSetName=")+ compoundSetName)+", outputFormat=")+ outputFormat)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((("CompoundsetDownloadParams"+" [compoundSetRef=")+ compoundSetRef)+", outputFormat=")+ outputFormat)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

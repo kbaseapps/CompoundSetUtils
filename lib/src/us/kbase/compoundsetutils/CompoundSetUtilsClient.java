@@ -207,8 +207,8 @@ public class CompoundSetUtilsClient {
      * <pre>
      * CompoundSetFromModel
      * required:
-     * string workspace_name
-     * string model_name
+     * string workspace_id
+     * string model_ref
      * string compound_set_name
      * </pre>
      * @param   params   instance of type {@link us.kbase.compoundsetutils.CompoundsetFromModelParams CompoundsetFromModelParams} (original type "compoundset_from_model_params")
