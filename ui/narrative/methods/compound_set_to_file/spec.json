@@ -53,12 +53,9 @@
             "method": "compound_set_to_file",
             "input_mapping": [
                 {
-                    "narrative_system_variable": "workspace",
-                    "target_property": "workspace_name"
-                },
-                {
                     "input_parameter": "compound_set_name",
-                    "target_property": "compound_set_name"
+                    "target_property": "compound_set_ref",
+                    "target_type_transform": "ref"
                 },
                 {
                     "input_parameter": "output_format",

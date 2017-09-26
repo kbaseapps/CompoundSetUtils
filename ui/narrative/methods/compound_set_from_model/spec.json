@@ -42,11 +42,12 @@
             "input_mapping": [
                 {
                     "narrative_system_variable": "workspace",
-                    "target_property": "workspace_name"
+                    "target_property": "workspace_id"
                 },
                 {
                     "input_parameter": "model_name",
-                    "target_property": "model_name"
+                    "target_property": "model_ref",
+                    "target_type_transform": "ref"
                 },
                 {
                     "input_parameter": "compound_set_name",
