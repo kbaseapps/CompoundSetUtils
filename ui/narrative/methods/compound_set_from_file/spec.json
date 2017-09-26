@@ -41,9 +41,8 @@
             "method": "compound_set_from_file",
             "input_mapping": [
                 {
-                    "narrative_system_variable": "workspace",
-                    "target_property": "workspace_id",
-                    "target_type_transform": "ref"
+                    "narrative_system_variable": "workspace_id",
+                    "target_property": "workspace_id"
                 },
                 {
                     "input_parameter": "staging_file_path",

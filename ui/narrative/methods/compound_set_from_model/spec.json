@@ -41,7 +41,7 @@
             "method": "compound_set_from_model",
             "input_mapping": [
                 {
-                    "narrative_system_variable": "workspace",
+                    "narrative_system_variable": "workspace_id",
                     "target_property": "workspace_id"
                 },
                 {
