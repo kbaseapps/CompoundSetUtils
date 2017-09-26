@@ -19,32 +19,32 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "workspace_name",
+    "workspace_id",
     "staging_file_path",
     "compound_set_name"
 })
 public class CompoundsetUploadParams {
 
-    @JsonProperty("workspace_name")
-    private String workspaceName;
+    @JsonProperty("workspace_id")
+    private String workspaceId;
     @JsonProperty("staging_file_path")
     private String stagingFilePath;
     @JsonProperty("compound_set_name")
     private String compoundSetName;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("workspace_name")
-    public String getWorkspaceName() {
-        return workspaceName;
+    @JsonProperty("workspace_id")
+    public String getWorkspaceId() {
+        return workspaceId;
     }
 
-    @JsonProperty("workspace_name")
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
+    @JsonProperty("workspace_id")
+    public void setWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
-    public CompoundsetUploadParams withWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
+    public CompoundsetUploadParams withWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
         return this;
     }
 
@@ -90,7 +90,7 @@ public class CompoundsetUploadParams {
 
     @Override
     public String toString() {
-        return ((((((((("CompoundsetUploadParams"+" [workspaceName=")+ workspaceName)+", stagingFilePath=")+ stagingFilePath)+", compoundSetName=")+ compoundSetName)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((("CompoundsetUploadParams"+" [workspaceId=")+ workspaceId)+", stagingFilePath=")+ stagingFilePath)+", compoundSetName=")+ compoundSetName)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

@@ -19,47 +19,47 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "workspace_name",
-    "model_name",
+    "workspace_id",
+    "model_ref",
     "compound_set_name"
 })
 public class CompoundsetFromModelParams {
 
-    @JsonProperty("workspace_name")
-    private String workspaceName;
-    @JsonProperty("model_name")
-    private String modelName;
+    @JsonProperty("workspace_id")
+    private String workspaceId;
+    @JsonProperty("model_ref")
+    private String modelRef;
     @JsonProperty("compound_set_name")
     private String compoundSetName;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("workspace_name")
-    public String getWorkspaceName() {
-        return workspaceName;
+    @JsonProperty("workspace_id")
+    public String getWorkspaceId() {
+        return workspaceId;
     }
 
-    @JsonProperty("workspace_name")
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
+    @JsonProperty("workspace_id")
+    public void setWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
-    public CompoundsetFromModelParams withWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
+    public CompoundsetFromModelParams withWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
         return this;
     }
 
-    @JsonProperty("model_name")
-    public String getModelName() {
-        return modelName;
+    @JsonProperty("model_ref")
+    public String getModelRef() {
+        return modelRef;
     }
 
-    @JsonProperty("model_name")
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
+    @JsonProperty("model_ref")
+    public void setModelRef(String modelRef) {
+        this.modelRef = modelRef;
     }
 
-    public CompoundsetFromModelParams withModelName(String modelName) {
-        this.modelName = modelName;
+    public CompoundsetFromModelParams withModelRef(String modelRef) {
+        this.modelRef = modelRef;
         return this;
     }
 
@@ -90,7 +90,7 @@ public class CompoundsetFromModelParams {
 
     @Override
     public String toString() {
-        return ((((((((("CompoundsetFromModelParams"+" [workspaceName=")+ workspaceName)+", modelName=")+ modelName)+", compoundSetName=")+ compoundSetName)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((("CompoundsetFromModelParams"+" [workspaceId=")+ workspaceId)+", modelRef=")+ modelRef)+", compoundSetName=")+ compoundSetName)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

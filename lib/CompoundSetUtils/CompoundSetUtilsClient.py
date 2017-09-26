@@ -38,7 +38,7 @@ class CompoundSetUtils(object):
         CompoundSetFromFile
         string staging_file_path
         :param params: instance of type "compoundset_upload_params" ->
-           structure: parameter "workspace_name" of String, parameter
+           structure: parameter "workspace_id" of String, parameter
            "staging_file_path" of String, parameter "compound_set_name" of
            String
         :returns: instance of type "compoundset_upload_results" -> structure:
@@ -55,8 +55,8 @@ class CompoundSetUtils(object):
         string compound_set_name
         string output_format
         :param params: instance of type "compoundset_download_params" ->
-           structure: parameter "workspace_name" of String, parameter
-           "compound_set_name" of String, parameter "output_format" of String
+           structure: parameter "compound_set_ref" of String, parameter
+           "output_format" of String
         :returns: instance of type "compoundset_download_results" ->
            structure: parameter "report_name" of String, parameter
            "report_ref" of String
@@ -69,12 +69,12 @@ class CompoundSetUtils(object):
         """
         CompoundSetFromModel
         required:
-        string workspace_name
-        string model_name
+        string workspace_id
+        string model_ref
         string compound_set_name
         :param params: instance of type "compoundset_from_model_params" ->
-           structure: parameter "workspace_name" of String, parameter
-           "model_name" of String, parameter "compound_set_name" of String
+           structure: parameter "workspace_id" of String, parameter
+           "model_ref" of String, parameter "compound_set_name" of String
         :returns: instance of type "compoundset_upload_results" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "compoundset_ref" of type "obj_ref"
