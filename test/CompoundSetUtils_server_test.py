@@ -108,6 +108,16 @@ class CompoundSetUtilsTest(unittest.TestCase):
 
     @patch.object(DataFileUtil, "download_staging_file",
                   new=fake_staging_download)
+    def test_compound_set_from_exported_tsv(self):
+        params = {'workspace_id': self.getWsId(),
+                  'staging_file_path': 'test_out.tsv',
+                  'compound_set_name': 'tsv_set'}
+        ret = self.getImpl().compound_set_from_file(self.getContext(), params)[
+            0]
+        assert ret and ('report_name' in ret)
+
+    @patch.object(DataFileUtil, "download_staging_file",
+                  new=fake_staging_download)
     def test_compound_set_from_file_sdf(self):
         params = {'workspace_id': self.getWsId(),
                   'staging_file_path': 'test_compounds.sdf',
