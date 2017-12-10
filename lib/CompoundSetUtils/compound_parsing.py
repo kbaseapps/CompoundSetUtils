@@ -29,11 +29,14 @@ def read_tsv(file_path, structure_field='structure',
     w = csv.DictReader(open(file_path), dialect='excel-tab')
     for i, line in enumerate(w):
         # Generate Mol object from InChI code if present
-        if "InChI=" in line[structure_field]:
-            mol = AllChem.MolFromInchi(line[structure_field])
-        # Otherwise generate Mol object from SMILES string
-        else:
-            mol = AllChem.MolFromSmiles(line[structure_field])
+        if 'structure' in line:
+            if "InChI=" in line['structure']:
+                mol = AllChem.MolFromInchi(line['structure'])
+            # Otherwise generate Mol object from SMILES string
+            else:
+                mol = AllChem.MolFromSmiles(line['structure'])
+        elif 'smiles' in line:
+            mol = AllChem.MolFromSmiles(line['smiles'])
         if not mol:
             print("Unable to Parse %s" % line[structure_field])
             continue
@@ -43,7 +46,7 @@ def read_tsv(file_path, structure_field='structure',
         else:
             comp['id'] = '%s_%s' % (file_name, i + 1)
         for col in cols_to_copy:
-            if col in line:
+            if col in line and line[col]:
                 comp[col] = cols_to_copy[col](line[col])
         compounds.append(comp)
     return compounds
