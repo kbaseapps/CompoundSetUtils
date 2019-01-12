@@ -1,7 +1,9 @@
-from rdkit.Chem import AllChem, Descriptors
-import os
 import csv
 import json
+import logging
+import os
+
+from rdkit.Chem import AllChem, Descriptors
 
 
 def _make_compound_info(mol_object):
@@ -28,6 +30,7 @@ def read_tsv(file_path, structure_field='structure',
     compounds = []
     w = csv.DictReader(open(file_path), dialect='excel-tab')
     for i, line in enumerate(w):
+        mol = None
         # Generate Mol object from InChI code if present
         if 'structure' in line:
             if "InChI=" in line['structure']:
@@ -38,7 +41,7 @@ def read_tsv(file_path, structure_field='structure',
         elif 'smiles' in line:
             mol = AllChem.MolFromSmiles(line['smiles'])
         if not mol:
-            print("Unable to Parse %s" % line[structure_field])
+            logging.warning("Unable to Parse %s" % line[structure_field])
             continue
         comp = _make_compound_info(mol)
         if comp['inchikey'] in inchi_dict:

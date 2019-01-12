@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
-from DataFileUtil.DataFileUtilClient import DataFileUtil
-from KBaseReport.KBaseReportClient import KBaseReport
-import CompoundSetUtils.compound_parsing as parse
+import logging
 import os
 import uuid
+
+import CompoundSetUtils.compound_parsing as parse
+from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.KBaseReportClient import KBaseReport
 #END_HEADER
 
 
@@ -25,8 +27,8 @@ Contains tools for import & export of compound sets
     # the latter method is running.
     ######################################### noqa
     VERSION = "2.0.0"
-    GIT_URL = "git@github.com:JamesJeffryes/CompoundSetUtils-1.git"
-    GIT_COMMIT_HASH = "fd43d3b7b2c71ce70d25ce7d92ca824296f88ded"
+    GIT_URL = "git@github.com:kbaseapps/CompoundSetUtils.git"
+    GIT_COMMIT_HASH = "fe9839c7b2a6371babb0b017f23a9f3ad41aa5b9"
 
     #BEGIN_CLASS_HEADER
     @staticmethod
@@ -40,7 +42,7 @@ Contains tools for import & export of compound sets
         defined_param = set(req_param+opt_param)
         for param in in_params:
             if param not in defined_param:
-                print("WARNING: received unexpected parameter {}".format(param))
+                logging.warning("Received unexpected parameter {}".format(param))
 
     def _save_to_ws_and_report(self, ws_id, source, compoundset):
         """Save compound set to the workspace and make report"""
@@ -69,7 +71,7 @@ Contains tools for import & export of compound sets
         return output
 
     def _export_compound_set(self, ref, file_type):
-        print("Exporting {} as {}".format(ref, file_type))
+        logging.info("Exporting {} as {}".format(ref, file_type))
         compoundset = self.dfu.get_objects(
             {'object_refs': [ref]}
         )['data'][0]['data']

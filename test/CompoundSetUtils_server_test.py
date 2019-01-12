@@ -1,26 +1,20 @@
 # -*- coding: utf-8 -*-
-import unittest
-import os  # noqa: F401
 import json  # noqa: F401
+import os  # noqa: F401
+import pickle
+import shutil
 import time
-import requests
-
+import unittest
+from configparser import ConfigParser
 from os import environ
-try:
-    from ConfigParser import ConfigParser  # py2
-except:
-    from configparser import ConfigParser  # py3
 
-from pprint import pprint  # noqa: F401
+from unittest.mock import patch
 
-from biokbase.workspace.client import Workspace as workspaceService
 from CompoundSetUtils.CompoundSetUtilsImpl import CompoundSetUtils
 from CompoundSetUtils.CompoundSetUtilsServer import MethodContext
 from CompoundSetUtils.authclient import KBaseAuth as _KBaseAuth
-from DataFileUtil.DataFileUtilClient import DataFileUtil
-from mock import patch
-import shutil
-import pickle
+from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 
 class CompoundSetUtilsTest(unittest.TestCase):
@@ -53,7 +47,6 @@ class CompoundSetUtilsTest(unittest.TestCase):
         cls.wsClient = workspaceService(cls.wsURL)
         cls.serviceImpl = CompoundSetUtils(cls.cfg)
         cls.scratch = cls.cfg['scratch']
-        print(cls.scratch)
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
 
     @classmethod
