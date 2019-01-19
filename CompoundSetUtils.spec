@@ -27,8 +27,7 @@ module CompoundSetUtils {
         returns (compoundset_upload_results output) authentication required;
 
     typedef structure {
-        string report_name;
-        string report_ref;
+        string file_path;
     } compoundset_download_results;
 
     typedef structure {

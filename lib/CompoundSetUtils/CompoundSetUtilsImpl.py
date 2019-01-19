@@ -173,35 +173,19 @@ Contains tools for import & export of compound sets
         ret = self.dfu.get_objects(
             {'object_refs': [params['compound_set_ref']]}
         )['data'][0]
-        workspace_name = ret['info'][7]
         compoundset = ret['data']
         ext = params['output_format']
-        out = "%s/%s.%s" % (self.scratch, compoundset['name'], ext)
+        out = f"{self.scratch}/{uuid.uuid4()}"
+        os.mkdir(out)
+        out += f"/{compoundset['name']}"
         if ext == 'sdf':
             outfile_path = parse.write_sdf(compoundset, out)
         elif ext == 'tsv':
             outfile_path = parse.write_tsv(compoundset, out)
         else:
-            raise ValueError('Invalid output file type. Expects tsv or sdf')
+            outfile_path = parse.write_mol_dir(compoundset, out, ext)
+        output = {'file_path': outfile_path}
 
-        report_files = [{'path': outfile_path,
-                         'name': os.path.basename(outfile_path),
-                         'label': os.path.basename(outfile_path),
-                         'description': 'A compound set in %s format' % ext}]
-
-        report_params = {
-            'message': 'Converted %s compound set to %s format.' % (
-                compoundset['name'], params['output_format']),
-            'file_links': report_files,
-            'workspace_name': workspace_name,
-            'report_object_name': 'compound_set_download_report'
-        }
-
-        # Construct the output to send back
-        report_client = KBaseReport(self.callback_url)
-        report_info = report_client.create_extended_report(report_params)
-        output = {'report_name': report_info['name'],
-                  'report_ref': report_info['ref']}
         #END compound_set_to_file
 
         # At some point might do deeper type checking...

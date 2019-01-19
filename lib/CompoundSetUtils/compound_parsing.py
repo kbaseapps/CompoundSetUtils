@@ -98,6 +98,7 @@ def write_tsv(compound_set, outfile_path):
     cols = ['id', 'name', 'smiles', 'inchikey', 'charge', 'formula', 'mass',
             'exactmass', 'compound_ref', 'modelcompound_ref', 'deltag',
             'deltagerr']
+    outfile_path + ".tsv"
     writer = csv.DictWriter(open(outfile_path, 'w'), cols, dialect='excel-tab',
                             extrasaction='ignore')
     writer.writeheader()
@@ -108,12 +109,38 @@ def write_tsv(compound_set, outfile_path):
 
 def write_sdf(compound_set, outfile_path):
     no_export = {'smiles', 'fingerprints', 'dblinks'}
+    outfile_path += ".sdf"
     writer = AllChem.SDWriter(open(outfile_path, 'w'))
     for compound in compound_set['compounds']:
         mol = AllChem.MolFromSmiles(compound['smiles'])
+        _calc_3d_coord(mol)
         for prop, val in compound.items():
             if prop in no_export:
                 continue
             mol.SetProp(str(prop), str(val))
         writer.write(mol)
     return outfile_path
+
+
+def write_mol_dir(compound_set, outfile_path, out_type='mol'):
+    os.mkdir(outfile_path)
+    for compound in compound_set['compounds']:
+        mol = AllChem.MolFromSmiles(compound['smiles'])
+        _calc_3d_coord(mol)
+        if out_type == 'mol':
+            AllChem.MolToMolFile(mol, f'{outfile_path}/{compound["id"]}.mol')
+        elif out_type == 'pdb':
+            AllChem.MolToPDBFile(mol, f'{outfile_path}/{compound["id"]}.pdb')
+        else:
+            ValueError('Invalid output_format. Expects tsv, sdf, mol, or pdb')
+    return outfile_path
+
+
+def _calc_3d_coord(mol):
+    AllChem.AddHs(mol)
+    AllChem.EmbedMolecule(mol, useRandomCoords=True)
+    try:
+        AllChem.MMFFOptimizeMolecule(mol)
+    except ValueError:
+        logging.warning("Unable to make 3d cords.")
+    AllChem.RemoveHs(mol)

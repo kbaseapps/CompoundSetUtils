@@ -95,7 +95,7 @@ class CompoundSetUtilsTest(unittest.TestCase):
     def test_compound_set_from_file_tsv(self):
         params = {'workspace_id': self.getWsId(),
                   'staging_file_path': 'test_compounds.tsv',
-                  'compound_set_name': 'sdf_set'}
+                  'compound_set_name': 'tsv_set'}
         ret = self.getImpl().compound_set_from_file(self.getContext(), params)[0]
         assert ret and ('report_name' in ret)
 
@@ -104,9 +104,8 @@ class CompoundSetUtilsTest(unittest.TestCase):
     def test_compound_set_from_exported_tsv(self):
         params = {'workspace_id': self.getWsId(),
                   'staging_file_path': 'test_out.tsv',
-                  'compound_set_name': 'tsv_set'}
-        ret = self.getImpl().compound_set_from_file(self.getContext(), params)[
-            0]
+                  'compound_set_name': 'tsv_set_2'}
+        ret = self.getImpl().compound_set_from_file(self.getContext(), params)[0]
         assert ret and ('report_name' in ret)
 
     @patch.object(DataFileUtil, "download_staging_file",
@@ -123,14 +122,38 @@ class CompoundSetUtilsTest(unittest.TestCase):
         params = {'compound_set_ref': compoundset_ref,
                   'output_format': 'tsv'}
         ret = self.getImpl().compound_set_to_file(self.getContext(), params)[0]
-        assert ret and ('report_name' in ret)
+        assert ret and ('file_path' in ret)
 
     def test_compound_set_to_file_sdf(self):
         compoundset_ref = self.save_compound_set()
         params = {'compound_set_ref': compoundset_ref,
                   'output_format': 'sdf'}
         ret = self.getImpl().compound_set_to_file(self.getContext(), params)[0]
-        assert ret and ('report_name' in ret)
+        assert ret and ('file_path' in ret)
+
+    def test_compound_set_to_file_mol(self):
+        compoundset_ref = self.save_compound_set()
+        params = {'compound_set_ref': compoundset_ref,
+                  'output_format': 'mol'}
+        ret = self.getImpl().compound_set_to_file(self.getContext(), params)[0]
+        assert ret and ('file_path' in ret)
+
+    def test_compound_set_to_file_pdb(self):
+        compoundset_ref = self.save_compound_set()
+        params = {'compound_set_ref': compoundset_ref,
+                  'output_format': 'pdb'}
+        ret = self.getImpl().compound_set_to_file(self.getContext(), params)[0]
+        assert ret and ('file_path' in ret)
+
+    def test_compound_set_to_file_bad_input(self):
+        compoundset_ref = self.save_compound_set()
+        with self.assertRaisesRegex(ValueError, 'parameter is required'):
+            self.getImpl().compound_set_to_file(self.getContext(),
+                                                {'compound_set_ref': compoundset_ref})
+
+        with self.assertRaisesRegex(ValueError, 'parameter is required'):
+            self.getImpl().compound_set_to_file(self.getContext(),
+                                                {'output_format': 'pdb'})
 
     def test_compound_set_from_model(self):
         model = json.load(open('/kb/module/test/iMR1_799.json'))
