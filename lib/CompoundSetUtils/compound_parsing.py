@@ -63,6 +63,7 @@ def read_sdf(file_path, inchi_path='/kb/module/data/Inchikey_IDs.json'):
     for i, mol in enumerate(sdf):
         comp = _make_compound_info(mol)
         comp['name'] = mol.GetProp("_Name")
+        comp['mol'] = AllChem.MolToMolBlock(mol)
         if comp['inchikey'] in inchi_dict:
             comp['id'] = inchi_dict[comp['inchikey']]
         else:
@@ -112,8 +113,7 @@ def write_sdf(compound_set, outfile_path):
     outfile_path += ".sdf"
     writer = AllChem.SDWriter(open(outfile_path, 'w'))
     for compound in compound_set['compounds']:
-        mol = AllChem.MolFromSmiles(compound['smiles'])
-        _calc_3d_coord(mol)
+        mol = _get_mol_from_compound(compound)
         for prop, val in compound.items():
             if prop in no_export:
                 continue
@@ -125,8 +125,7 @@ def write_sdf(compound_set, outfile_path):
 def write_mol_dir(compound_set, outfile_path, out_type='mol'):
     os.mkdir(outfile_path)
     for compound in compound_set['compounds']:
-        mol = AllChem.MolFromSmiles(compound['smiles'])
-        _calc_3d_coord(mol)
+        mol = _get_mol_from_compound(compound)
         if out_type == 'mol':
             AllChem.MolToMolFile(mol, f'{outfile_path}/{compound["id"]}.mol')
         elif out_type == 'pdb':
@@ -134,6 +133,15 @@ def write_mol_dir(compound_set, outfile_path, out_type='mol'):
         else:
             ValueError('Invalid output_format. Expects tsv, sdf, mol, or pdb')
     return outfile_path
+
+
+def _get_mol_from_compound(compound):
+    if compound.get('mol'):
+        mol = AllChem.MolFromMolBlock(compound['mol'])
+    else:
+        mol = AllChem.MolFromSmiles(compound['smiles'])
+        _calc_3d_coord(mol)
+    return mol
 
 
 def _calc_3d_coord(mol):
