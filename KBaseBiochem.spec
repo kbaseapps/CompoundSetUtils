@@ -3,6 +3,12 @@
 */
 module KBaseBiochem {
 	typedef int bool;
+  /*
+   * Reference to a handle ID
+   * @id handle
+   */
+  typedef string handle_ref;
+
 	/*
 		Reference to a reaction object in a biochemistry
 		@id subws KBaseBiochem.BiochemistryStructures.structures.[*].id
@@ -261,7 +267,7 @@ module KBaseBiochem {
 	/*
     	ImportedCompound object
 
-    	@optional deltag deltagerr mass exactmass compound_ref modelcompound_ref charge name mol
+    	@optional deltag deltagerr mass exactmass compound_ref modelcompound_ref charge name mol mol2_handle_ref
     */
 	typedef structure {
 		string id;
@@ -269,6 +275,7 @@ module KBaseBiochem {
 		string smiles;
 		string inchikey;
 		string mol;
+    handle_ref mol2_handle_ref;
 		float charge;
 		string formula;
 		float mass;
