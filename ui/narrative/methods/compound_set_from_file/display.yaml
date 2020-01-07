@@ -31,7 +31,14 @@ suggestions:
 parameters :
     staging_file_path :
         ui-name : |
-            Stageing File Path
+            Compounds Stageing File Path
+        short-hint : |
+            The path to the file to import in stageing.
+        long-hint  : |
+            The path to the file to import in stageing.
+    mol2_staging_file_path :
+        ui-name : |
+            Packed Mol2 Files Stageing Path
         short-hint : |
             The path to the file to import in stageing.
         long-hint  : |

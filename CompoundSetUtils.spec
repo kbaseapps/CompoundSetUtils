@@ -10,6 +10,7 @@ module CompoundSetUtils {
         string workspace_id;
         string staging_file_path;
         string compound_set_name;
+        string mol2_staging_file_path;
     } compoundset_upload_params;
 
     typedef structure {
@@ -28,6 +29,7 @@ module CompoundSetUtils {
 
     typedef structure {
         string file_path;
+        string mol2_file_path;
     } compoundset_download_results;
 
     typedef structure {
