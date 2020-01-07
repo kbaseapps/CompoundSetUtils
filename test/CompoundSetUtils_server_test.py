@@ -7,6 +7,8 @@ import time
 import unittest
 from configparser import ConfigParser
 from os import environ
+import zipfile
+import csv
 
 from unittest.mock import patch
 
@@ -119,12 +121,35 @@ class CompoundSetUtilsTest(unittest.TestCase):
         ret = self.getImpl().compound_set_from_file(self.getContext(), params)[0]
         assert ret and ('report_name' in ret)
 
+    @patch.object(DataFileUtil, "download_staging_file",
+                  new=fake_staging_download)
     def test_compound_set_to_file_tsv(self):
-        compoundset_ref = self.save_compound_set()
+
+        params = {'workspace_id': self.getWsId(),
+                  'staging_file_path': 'test_compounds.tsv',
+                  'compound_set_name': 'tsv_set',
+                  'mol2_staging_file_path': 'mol2_files.zip'}
+        ret = self.getImpl().compound_set_from_file(self.getContext(), params)[0]
+        compoundset_ref = ret['compoundset_ref']
         params = {'compound_set_ref': compoundset_ref,
                   'output_format': 'tsv'}
         ret = self.getImpl().compound_set_to_file(self.getContext(), params)[0]
-        assert ret and ('file_path' in ret)
+        assert ret and ('file_path' in ret) and ('mol2_file_path' in ret)
+
+        print('compound_set_from_file output\n{}\n'.format(ret))
+
+        mol2_file_path = ret['mol2_file_path']
+
+        mol2_files = zipfile.ZipFile(mol2_file_path).namelist()
+        mol2_file_names = [os.path.splitext(os.path.basename(mol2_file))[0] for mol2_file in mol2_files]
+
+        w = csv.DictReader(open('test_compounds.tsv'), dialect='excel-tab')
+
+        comp_ids = []
+        for line in w:
+            comp_ids.append(line.get('id'))
+
+        self.assertCountEqual(mol2_file_names, comp_ids)
 
     def test_compound_set_to_file_sdf(self):
         compoundset_ref = self.save_compound_set()
@@ -178,3 +203,27 @@ class CompoundSetUtilsTest(unittest.TestCase):
         ret2 = self.getImpl().export_compoundset_as_sdf(
             self.getContext(), {'input_ref': compoundset_ref})[0]['shock_id']
         assert ret2 and ret2.count('-') == 4
+
+    @patch.object(DataFileUtil, "download_staging_file",
+                  new=fake_staging_download)
+    def test_mol2_export(self):
+        params = {'workspace_id': self.getWsId(),
+                  'staging_file_path': 'test_compounds.tsv',
+                  'compound_set_name': 'tsv_set',
+                  'mol2_staging_file_path': 'mol2_files.zip'}
+        ret = self.getImpl().compound_set_from_file(self.getContext(), params)[0]
+
+        mol2_file = self.getImpl().export_compoundset_mol2_files(
+                                    self.getContext(),
+                                    {'input_ref': ret['compoundset_ref']})[0]['mol2_file_path']
+
+        mol2_files = zipfile.ZipFile(mol2_file).namelist()
+        mol2_file_names = [os.path.splitext(os.path.basename(mol2_file))[0] for mol2_file in mol2_files]
+
+        w = csv.DictReader(open('test_compounds.tsv'), dialect='excel-tab')
+
+        comp_ids = []
+        for line in w:
+            comp_ids.append(line.get('id'))
+
+        self.assertCountEqual(mol2_file_names, comp_ids)

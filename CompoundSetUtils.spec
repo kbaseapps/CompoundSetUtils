@@ -77,4 +77,11 @@ module CompoundSetUtils {
 
     funcdef export_compoundset_as_sdf(ExportParams params)
         returns (ExportOutput output) authentication required;
+
+    typedef structure {
+        string mol2_file_path;
+    } export_mol2_files_results;
+
+    funcdef export_compoundset_mol2_files(ExportParams params)
+        returns (export_mol2_files_results output) authentication required;
 };

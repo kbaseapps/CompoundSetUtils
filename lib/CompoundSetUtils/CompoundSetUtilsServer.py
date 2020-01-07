@@ -358,6 +358,10 @@ class Application(object):
                              name='CompoundSetUtils.export_compoundset_as_sdf',
                              types=[dict])
         self.method_authentication['CompoundSetUtils.export_compoundset_as_sdf'] = 'required'  # noqa
+        self.rpc_service.add(impl_CompoundSetUtils.export_compoundset_mol2_files,
+                             name='CompoundSetUtils.export_compoundset_mol2_files',
+                             types=[dict])
+        self.method_authentication['CompoundSetUtils.export_compoundset_mol2_files'] = 'required'  # noqa
         self.rpc_service.add(impl_CompoundSetUtils.status,
                              name='CompoundSetUtils.status',
                              types=[dict])
