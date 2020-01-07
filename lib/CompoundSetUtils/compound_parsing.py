@@ -27,29 +27,28 @@ def read_tsv(file_path, structure_field='structure',
              inchi_path='/kb/module/data/Inchikey_IDs.json', mol2_file_dir=None,
              callback_url=None):
 
-    mol2_files = None
-    if mol2_file_dir:
-        mol2_files = os.listdir(mol2_file_dir)
-        mol2_file_names = [os.path.splitext(mol2_file)[0] for mol2_file in mol2_files]
-
     inchi_dict = json.load(open(inchi_path))
     cols_to_copy = {'name': str, 'deltag': float, 'deltagerr': float}
     file_name = os.path.splitext(os.path.basename(file_path))[0]
     compounds = []
     w = csv.DictReader(open(file_path), dialect='excel-tab')
     for i, line in enumerate(w):
-
         comp_id = line.get('id')
         handle_id = None
-        if comp_id and mol2_files:
-            if comp_id in mol2_file_names:
-                mol2_file_name = mol2_files[mol2_file_names.index(comp_id)]
-                mol2_file_path = os.path.join(mol2_file_dir, mol2_file_name)
+        if comp_id and mol2_file_dir:
+            mol2_file_path = None
+            for root, dirs, files in os.walk(mol2_file_dir):
+                for file in files:
+                    if os.path.splitext(file)[0] == comp_id:
+                        logging.info('Found a matching mol2 file {} for compound {}'.format(str(file), comp_id))
+                        mol2_file_path = os.path.join(root, str(file))
+
+            if mol2_file_path:
                 dfu = DataFileUtil(callback_url)
                 handle_id = dfu.file_to_shock({'file_path': mol2_file_path,
                                                'make_handle': True})['handle']['hid']
             else:
-                logging.warning('Unable to file a matching mol2 file for compound: {}'.format(comp_id))
+                logging.warning('Unable to find a matching mol2 file for compound: {}'.format(comp_id))
 
         mol = None
         # Generate Mol object from InChI code if present
@@ -83,28 +82,28 @@ def read_tsv(file_path, structure_field='structure',
 def read_sdf(file_path, inchi_path='/kb/module/data/Inchikey_IDs.json', mol2_file_dir=None,
              callback_url=None):
 
-    mol2_files = None
-    if mol2_file_dir:
-        mol2_files = os.listdir(mol2_file_dir)
-        mol2_file_names = [os.path.splitext(mol2_file)[0] for mol2_file in mol2_files]
-
     inchi_dict = json.load(open(inchi_path))
     file_name = os.path.splitext(os.path.basename(file_path))[0]
     sdf = AllChem.SDMolSupplier(file_path.encode('ascii', 'ignore'))
     compounds = []
     for i, mol in enumerate(sdf):
         comp_id = mol.GetPropsAsDict().get('id')
-        print('Get compound ID: {}'.format(comp_id))
+        print('Found compound ID: {}'.format(comp_id))
         handle_id = None
-        if comp_id and mol2_files:
-            if comp_id in mol2_file_names:
-                mol2_file_name = mol2_files[mol2_file_names.index(comp_id)]
-                mol2_file_path = os.path.join(mol2_file_dir, mol2_file_name)
+        if comp_id and mol2_file_dir:
+            mol2_file_path = None
+            for root, dirs, files in os.walk(mol2_file_dir):
+                for file in files:
+                    if os.path.splitext(file)[0] == comp_id:
+                        logging.info('Found a matching mol2 file {} for compound {}'.format(str(file), comp_id))
+                        mol2_file_path = os.path.join(root, str(file))
+
+            if mol2_file_path:
                 dfu = DataFileUtil(callback_url)
                 handle_id = dfu.file_to_shock({'file_path': mol2_file_path,
                                                'make_handle': True})['handle']['hid']
             else:
-                logging.warning('Unable to file a matching mol2 file for compound: {}'.format(comp_id))
+                logging.warning('Unable to find a matching mol2 file for compound: {}'.format(comp_id))
 
         comp = _make_compound_info(mol)
         comp['name'] = mol.GetProp("_Name")

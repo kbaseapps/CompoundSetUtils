@@ -98,7 +98,7 @@ class CompoundSetUtilsTest(unittest.TestCase):
         params = {'workspace_id': self.getWsId(),
                   'staging_file_path': 'test_compounds.tsv',
                   'compound_set_name': 'tsv_set',
-                  'mol2_staging_file_path': 'mol2_files.zip'}
+                  'mol2_staging_file_path': 'mol2_files_missing_comp.zip'}
         ret = self.getImpl().compound_set_from_file(self.getContext(), params)[0]
         assert ret and ('report_name' in ret)
 
