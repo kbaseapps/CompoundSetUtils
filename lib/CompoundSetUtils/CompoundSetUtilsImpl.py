@@ -3,6 +3,7 @@
 import logging
 import os
 import uuid
+import zipfile
 
 import CompoundSetUtils.compound_parsing as parse
 from installed_clients.DataFileUtilClient import DataFileUtil
@@ -26,9 +27,9 @@ Contains tools for import & export of compound sets
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "2.1.1"
+    VERSION = "2.1.2"
     GIT_URL = "https://github.com/Tianhao-Gu/CompoundSetUtils.git"
-    GIT_COMMIT_HASH = "9edea34f83ba9f2b2a6a834e2172ff583f3ddd7a"
+    GIT_COMMIT_HASH = "32b0376a54fca2de05bfbc5eca33d14bf5104ce3"
 
     #BEGIN_CLASS_HEADER
     @staticmethod
@@ -90,6 +91,37 @@ Contains tools for import & export of compound sets
             {'file_path': out_dir, 'ws_refs': [ref]})
         output = {'shock_id': handle['shock_id']}
         return output
+
+    def _fetch_mol2_files(self, ref):
+        compoundset_obj = self.dfu.get_objects(
+            {'object_refs': [ref]}
+        )['data'][0]
+        compoundset_info = compoundset_obj['info']
+        compoundset = compoundset_obj['data']
+        temp_dir = "{}/{}".format(self.scratch, uuid.uuid4())
+        os.mkdir(temp_dir)
+
+        compounds = compoundset.get('compounds')
+
+        shock_to_file_params = []
+        for compound in compounds:
+            mol2_handle_ref = compound.get('mol2_handle_ref')
+
+            if mol2_handle_ref:
+                shock_to_file_params.append({'handle_id': mol2_handle_ref,
+                                             'file_path': temp_dir})
+
+        mol2_packed_file_path = None
+        if shock_to_file_params:
+            stf_out = self.dfu.shock_to_file_mass(shock_to_file_params)
+            mol2_files = [item.get('file_path') for item in stf_out]
+            mol2_packed_file_path = os.path.join(temp_dir, compoundset_info[1] + '_mol2_files.zip')
+            with zipfile.ZipFile(mol2_packed_file_path, 'w') as zipMe:
+                for file in mol2_files:
+                    zipMe.write(file, compress_type=zipfile.ZIP_DEFLATED)
+
+        return mol2_packed_file_path
+
     #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
@@ -207,7 +239,10 @@ Contains tools for import & export of compound sets
             outfile_path = parse.write_tsv(compoundset, out)
         else:
             outfile_path = parse.write_mol_dir(compoundset, out, ext)
-        output = {'file_path': outfile_path}
+
+        mol2_file = self._fetch_mol2_files(params['compound_set_ref'])
+
+        output = {'file_path': outfile_path, 'mol2_file_path': mol2_file}
 
         #END compound_set_to_file
 
@@ -298,6 +333,31 @@ Contains tools for import & export of compound sets
         # At some point might do deeper type checking...
         if not isinstance(output, dict):
             raise ValueError('Method export_compoundset_as_sdf return value ' +
+                             'output is not type dict as required.')
+        # return the results
+        return [output]
+
+    def export_compoundset_mol2_files(self, ctx, params):
+        """
+        :param params: instance of type "ExportParams" (input and output
+           structure functions for standard downloaders) -> structure:
+           parameter "input_ref" of String
+        :returns: instance of type "export_mol2_files_results" -> structure:
+           parameter "mol2_file_path" of String
+        """
+        # ctx is the context object
+        # return variables are: output
+        #BEGIN export_compoundset_mol2_files
+        self._check_param(params, ['input_ref'])
+
+        mol2_file = self._fetch_mol2_files(params['input_ref'])
+
+        output = {'mol2_file_path': mol2_file}
+        #END export_compoundset_mol2_files
+
+        # At some point might do deeper type checking...
+        if not isinstance(output, dict):
+            raise ValueError('Method export_compoundset_mol2_files return value ' +
                              'output is not type dict as required.')
         # return the results
         return [output]
