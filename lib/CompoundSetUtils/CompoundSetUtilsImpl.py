@@ -138,7 +138,9 @@ Contains tools for import & export of compound sets
                 logging.info("start unpacking mol2 file")
                 mol2_file_path_out = self.dfu.unpack_file(
                                             {'file_path': mol2_scratch_file_path})['file_path']
-                mol2_file_dir = os.path.dirname(mol2_file_path_out)
+                mol2_file_dir = os.path.join(os.path.dirname(mol2_file_path_out),
+                                             os.path.splitext(
+                                                        os.path.basename(mol2_file_path_out))[0])
             except Exception:
                 raise ValueError('Cannot unpack mol2 file: {}'.format(
                                                         os.path.basename(mol2_file_path_out)))
