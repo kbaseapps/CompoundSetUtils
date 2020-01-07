@@ -8,7 +8,7 @@ tooltip: |
 
 screenshots: []
 
-icon: icon.png
+icon: data-blue.png
 
 #
 # define a set of similar methods that might be useful to the user
@@ -33,16 +33,16 @@ parameters :
         ui-name : |
             Compounds Stageing File Path
         short-hint : |
-            The path to the file to import in stageing.
+            TSV or SDF format file represeting compounds
         long-hint  : |
-            The path to the file to import in stageing.
+            TSV or SDF format file represeting compounds
     mol2_staging_file_path :
         ui-name : |
             Packed Mol2 Files Stageing Path
         short-hint : |
-            The path to the file to import in stageing.
+            Zip file that contains mol2 files associated with each compound. (mol2 file name must match compound id given in TSV file. e.g. compound_id.mol2)
         long-hint  : |
-            The path to the file to import in stageing.
+            Zip file that contains mol2 Files associated with each compound. (mol2 file name must match compound id given in TSV file. e.g. compound_id.mol2)
     compound_set_name :
         ui-name : |
             Compound Set Name
