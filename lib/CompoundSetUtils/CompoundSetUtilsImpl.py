@@ -26,9 +26,9 @@ Contains tools for import & export of compound sets
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "2.0.0"
-    GIT_URL = "git@github.com:kbaseapps/CompoundSetUtils.git"
-    GIT_COMMIT_HASH = "fe9839c7b2a6371babb0b017f23a9f3ad41aa5b9"
+    VERSION = "2.1.1"
+    GIT_URL = "https://github.com/Tianhao-Gu/CompoundSetUtils.git"
+    GIT_COMMIT_HASH = "9edea34f83ba9f2b2a6a834e2172ff583f3ddd7a"
 
     #BEGIN_CLASS_HEADER
     @staticmethod
@@ -111,7 +111,7 @@ Contains tools for import & export of compound sets
         :param params: instance of type "compoundset_upload_params" ->
            structure: parameter "workspace_id" of String, parameter
            "staging_file_path" of String, parameter "compound_set_name" of
-           String
+           String, parameter "mol2_staging_file_path" of String
         :returns: instance of type "compoundset_upload_results" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "compoundset_ref" of type "obj_ref"
@@ -120,18 +120,39 @@ Contains tools for import & export of compound sets
         # return variables are: output
         #BEGIN compound_set_from_file
         self._check_param(params, ['workspace_id', 'staging_file_path',
-                                   'compound_set_name'])
+                                   'compound_set_name'], opt_param=['mol2_staging_file_path'])
         scratch_file_path = self.dfu.download_staging_file(
             {'staging_file_subdir_path': params['staging_file_path']}
         ).get('copy_file_path')
         # I probably should be uploading the raw files to shock
 
+        mol2_staging_file_path = params.get('mol2_staging_file_path')
+
+        mol2_file_dir = None
+        if mol2_staging_file_path:
+            mol2_scratch_file_path = self.dfu.download_staging_file(
+                    {'staging_file_subdir_path': mol2_staging_file_path}
+                ).get('copy_file_path')
+
+            try:
+                logging.info("start unpacking mol2 file")
+                mol2_file_path_out = self.dfu.unpack_file(
+                                            {'file_path': mol2_scratch_file_path})['file_path']
+                mol2_file_dir = os.path.dirname(mol2_file_path_out)
+            except Exception:
+                raise ValueError('Cannot unpack mol2 file: {}'.format(
+                                                        os.path.basename(mol2_file_path_out)))
+
         ext = os.path.splitext(scratch_file_path)[1]
         file_name = os.path.basename(scratch_file_path)
         if ext == '.sdf':
-            compounds = parse.read_sdf(scratch_file_path)
+            compounds = parse.read_sdf(scratch_file_path,
+                                       mol2_file_dir=mol2_file_dir,
+                                       callback_url=self.callback_url)
         elif ext == '.tsv':
-            compounds = parse.read_tsv(scratch_file_path)
+            compounds = parse.read_tsv(scratch_file_path,
+                                       mol2_file_dir=mol2_file_dir,
+                                       callback_url=self.callback_url)
         else:
             raise ValueError('Invalid input file type. Expects .tsv or .sdf')
 
@@ -163,8 +184,8 @@ Contains tools for import & export of compound sets
            structure: parameter "compound_set_ref" of String, parameter
            "output_format" of String
         :returns: instance of type "compoundset_download_results" ->
-           structure: parameter "report_name" of String, parameter
-           "report_ref" of String
+           structure: parameter "file_path" of String, parameter
+           "mol2_file_path" of String
         """
         # ctx is the context object
         # return variables are: output

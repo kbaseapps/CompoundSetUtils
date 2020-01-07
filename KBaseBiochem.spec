@@ -4,8 +4,8 @@
 module KBaseBiochem {
 	typedef int bool;
   /*
-   * Reference to a handle ID
-   * @id handle
+    Reference to a handle ID
+    @id handle
    */
   typedef string handle_ref;
 
@@ -287,7 +287,6 @@ module KBaseBiochem {
 		float deltag;
 		float deltagerr;
 	} ImportedCompound;
-
 	/*
     	CompoundSet object
 

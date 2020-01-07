@@ -95,7 +95,8 @@ class CompoundSetUtilsTest(unittest.TestCase):
     def test_compound_set_from_file_tsv(self):
         params = {'workspace_id': self.getWsId(),
                   'staging_file_path': 'test_compounds.tsv',
-                  'compound_set_name': 'tsv_set'}
+                  'compound_set_name': 'tsv_set',
+                  'mol2_staging_file_path': 'mol2_files.zip'}
         ret = self.getImpl().compound_set_from_file(self.getContext(), params)[0]
         assert ret and ('report_name' in ret)
 
@@ -113,7 +114,8 @@ class CompoundSetUtilsTest(unittest.TestCase):
     def test_compound_set_from_file_sdf(self):
         params = {'workspace_id': self.getWsId(),
                   'staging_file_path': 'test_compounds.sdf',
-                  'compound_set_name': 'sdf_set'}
+                  'compound_set_name': 'sdf_set',
+                  'mol2_staging_file_path': 'mol2_files.zip'}
         ret = self.getImpl().compound_set_from_file(self.getContext(), params)[0]
         assert ret and ('report_name' in ret)
 
@@ -176,6 +178,3 @@ class CompoundSetUtilsTest(unittest.TestCase):
         ret2 = self.getImpl().export_compoundset_as_sdf(
             self.getContext(), {'input_ref': compoundset_ref})[0]['shock_id']
         assert ret2 and ret2.count('-') == 4
-
-
-
