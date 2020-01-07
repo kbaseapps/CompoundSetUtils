@@ -27,12 +27,12 @@ class CompoundParseingTest(unittest.TestCase):
 
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
-        shutil.copytree('/kb/module/test/mol2_files', os.path.join(cls.scratch, 'mol2_files'))
+        shutil.copytree('/kb/module/test/mol2_files', os.path.join(cls.scratch, 'mol2_files_copy'))
 
     def test_read_tsv(self):
         compounds = compound_parsing.read_tsv('test_compounds.tsv', structure_field='structure',
                                               inchi_path='../data/Inchikey_IDs.json',
-                                              mol2_file_dir=os.path.join(self.scratch, 'mol2_files'),
+                                              mol2_file_dir=os.path.join(self.scratch, 'mol2_files_copy'),
                                               callback_url=os.environ['SDK_CALLBACK_URL'])
         self.assertEqual(len(compounds), 9)
         self.assertCountEqual(compounds[0].keys(), comp_keys - {'mol'} | {'mol2_handle_ref'})
