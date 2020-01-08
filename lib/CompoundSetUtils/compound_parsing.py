@@ -33,14 +33,17 @@ def read_tsv(file_path, structure_field='structure',
     compounds = []
     w = csv.DictReader(open(file_path), dialect='excel-tab')
     for i, line in enumerate(w):
-        comp_id = line.get('id')
+        user_id = line.get('id')
+        mol2_source = line.get('mol2_source')
         handle_id = None
-        if comp_id and mol2_file_dir:
+        if user_id and mol2_file_dir:
+            if not mol2_source:
+                raise ValueError('Please indicate mol2 file source in TSV file')
             mol2_file_path = None
             for root, dirs, files in os.walk(mol2_file_dir):
                 for file in files:
-                    if os.path.splitext(file)[0] == comp_id:
-                        logging.info('Found a matching mol2 file {} for compound {}'.format(str(file), comp_id))
+                    if os.path.splitext(file)[0] == user_id:
+                        logging.info('Found a matching mol2 file {} for compound {}'.format(str(file), user_id))
                         mol2_file_path = os.path.join(root, str(file))
 
             if mol2_file_path:
@@ -48,7 +51,7 @@ def read_tsv(file_path, structure_field='structure',
                 handle_id = dfu.file_to_shock({'file_path': mol2_file_path,
                                                'make_handle': True})['handle']['hid']
             else:
-                logging.warning('Unable to find a matching mol2 file for compound: {}'.format(comp_id))
+                logging.warning('Unable to find a matching mol2 file for compound: {}'.format(user_id))
 
         mol = None
         # Generate Mol object from InChI code if present
@@ -64,16 +67,25 @@ def read_tsv(file_path, structure_field='structure',
             logging.warning("Unable to Parse %s" % line[structure_field])
             continue
         comp = _make_compound_info(mol)
+
         if comp['inchikey'] in inchi_dict:
-            comp['id'] = inchi_dict[comp['inchikey']]
+            comp['kb_id'] = inchi_dict[comp['inchikey']]
         else:
-            comp['id'] = '%s_%s' % (file_name, i + 1)
+            comp['kb_id'] = '%s_%s' % (file_name, i + 1)
+
+        if user_id:
+            comp['id'] = user_id
+        else:
+            comp['id'] = comp['kb_id']
+
         for col in cols_to_copy:
             if col in line and line[col]:
                 comp[col] = cols_to_copy[col](line[col])
 
         if handle_id:
             comp['mol2_handle_ref'] = handle_id
+            comp['mol2_source'] = mol2_source
+
         compounds.append(comp)
 
     return compounds
@@ -87,15 +99,15 @@ def read_sdf(file_path, inchi_path='/kb/module/data/Inchikey_IDs.json', mol2_fil
     sdf = AllChem.SDMolSupplier(file_path.encode('ascii', 'ignore'))
     compounds = []
     for i, mol in enumerate(sdf):
-        comp_id = mol.GetPropsAsDict().get('id')
-        print('Found compound ID: {}'.format(comp_id))
+        user_id = mol.GetPropsAsDict().get('id')
+        print('Found compound ID: {}'.format(user_id))
         handle_id = None
-        if comp_id and mol2_file_dir:
+        if user_id and mol2_file_dir:
             mol2_file_path = None
             for root, dirs, files in os.walk(mol2_file_dir):
                 for file in files:
-                    if os.path.splitext(file)[0] == comp_id:
-                        logging.info('Found a matching mol2 file {} for compound {}'.format(str(file), comp_id))
+                    if os.path.splitext(file)[0] == user_id:
+                        logging.info('Found a matching mol2 file {} for compound {}'.format(str(file), user_id))
                         mol2_file_path = os.path.join(root, str(file))
 
             if mol2_file_path:
@@ -103,18 +115,24 @@ def read_sdf(file_path, inchi_path='/kb/module/data/Inchikey_IDs.json', mol2_fil
                 handle_id = dfu.file_to_shock({'file_path': mol2_file_path,
                                                'make_handle': True})['handle']['hid']
             else:
-                logging.warning('Unable to find a matching mol2 file for compound: {}'.format(comp_id))
+                logging.warning('Unable to find a matching mol2 file for compound: {}'.format(user_id))
 
         comp = _make_compound_info(mol)
         comp['name'] = mol.GetProp("_Name")
         comp['mol'] = AllChem.MolToMolBlock(mol)
         if comp['inchikey'] in inchi_dict:
-            comp['id'] = inchi_dict[comp['inchikey']]
+            comp['kb_id'] = inchi_dict[comp['inchikey']]
         else:
-            comp['id'] = '%s_%s' % (file_name, i + 1)
+            comp['kb_id'] = '%s_%s' % (file_name, i + 1)
+
+        if user_id:
+            comp['id'] = user_id
+        else:
+            comp['id'] = comp['kb_id']
 
         if handle_id:
             comp['mol2_handle_ref'] = handle_id
+            comp['mol2_source'] = 'user uploaded'
 
         compounds.append(comp)
     return compounds
