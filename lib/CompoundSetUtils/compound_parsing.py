@@ -162,7 +162,7 @@ def parse_model(model, struct_path='/kb/module/data/Compound_Structures.json'):
 
 
 def write_tsv(compound_set, outfile_path):
-    cols = ['id', 'name', 'smiles', 'inchikey', 'charge', 'formula', 'mass',
+    cols = ['id', 'kb_id', 'name', 'smiles', 'inchikey', 'charge', 'formula', 'mass',
             'exactmass', 'compound_ref', 'modelcompound_ref', 'deltag',
             'deltagerr']
     outfile_path + ".tsv"
