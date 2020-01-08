@@ -267,15 +267,17 @@ module KBaseBiochem {
 	/*
     	ImportedCompound object
 
-    	@optional deltag deltagerr mass exactmass compound_ref modelcompound_ref charge name mol mol2_handle_ref
+    	@optional deltag deltagerr mass exactmass compound_ref modelcompound_ref charge name mol mol2_handle_ref mol2_source
     */
 	typedef structure {
 		string id;
+    string kb_id;
 		string name;
 		string smiles;
 		string inchikey;
 		string mol;
     handle_ref mol2_handle_ref;
+    string mol2_source;
 		float charge;
 		string formula;
 		float mass;

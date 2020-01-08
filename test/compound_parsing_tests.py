@@ -10,7 +10,8 @@ import filecmp
 from CompoundSetUtils import compound_parsing
 
 comp_keys = {'dblinks', 'deltag', 'smiles', 'fingerprints', 'name', 'id', 'mol',
-             'charge', 'exactmass', 'deltagerr', 'inchikey', 'formula', 'mass'}
+             'charge', 'exactmass', 'deltagerr', 'inchikey', 'formula', 'mass',
+             'kb_id'}
 
 
 class CompoundParseingTest(unittest.TestCase):
@@ -35,7 +36,7 @@ class CompoundParseingTest(unittest.TestCase):
                                               mol2_file_dir=os.path.join(self.scratch, 'mol2_files_copy'),
                                               callback_url=os.environ['SDK_CALLBACK_URL'])
         self.assertEqual(len(compounds), 9)
-        self.assertCountEqual(compounds[0].keys(), comp_keys - {'mol'} | {'mol2_handle_ref'})
+        self.assertCountEqual(compounds[0].keys(), comp_keys - {'mol'} | {'mol2_handle_ref', 'mol2_source'})
         self.assertEqual(len(compounds[0]['fingerprints']), 2)
         self.assertEqual(compounds[2]['id'], 'cpd00939')
 
