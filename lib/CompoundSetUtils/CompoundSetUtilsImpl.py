@@ -383,6 +383,7 @@ Contains tools for import & export of compound sets
 
         compoundset_copy = copy.deepcopy(compoundset)
 
+        count = 0
         for compound in compoundset_copy.get('compounds'):
             if not compound.get('mol2_handle_ref') or over_write:
                 temp_dir = os.path.join(self.scratch, str(uuid.uuid4()))
@@ -394,12 +395,13 @@ Contains tools for import & export of compound sets
                                                         'make_handle': True})['handle']['hid']
                     compound['mol2_handle_ref'] = handle_id
                     compound['mol2_source'] = 'ZINC15'
+                    count += 1
                 else:
                     logging.warning('Cannot find Mol2 file from ZINC for {}'.format(inchikey))
 
-        output = self._save_to_ws_and_report(params['workspace_id'], '',
-                                             compoundset_copy,
-                                             message='Successfully fetched mol2 files from ZINC database')
+        output = self._save_to_ws_and_report(
+                    params['workspace_id'], '', compoundset_copy,
+                    message='Successfully fetched {} Mol2 files from ZINC database'.format(count))
 
         #END fetch_mol2_files_from_zinc
 
