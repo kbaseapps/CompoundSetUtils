@@ -84,4 +84,13 @@ module CompoundSetUtils {
 
     funcdef export_compoundset_mol2_files(ExportParams params)
         returns (export_mol2_files_results output) authentication required;
+
+    typedef structure {
+        string workspace_id;
+        obj_ref compoundset_ref;
+        int over_write;
+    } FetchZINCMol2Params;
+
+    funcdef fetch_mol2_files_from_zinc(FetchZINCMol2Params params)
+        returns (compoundset_upload_results output) authentication required;
 };

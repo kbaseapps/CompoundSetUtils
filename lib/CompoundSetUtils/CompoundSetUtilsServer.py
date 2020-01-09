@@ -362,6 +362,10 @@ class Application(object):
                              name='CompoundSetUtils.export_compoundset_mol2_files',
                              types=[dict])
         self.method_authentication['CompoundSetUtils.export_compoundset_mol2_files'] = 'required'  # noqa
+        self.rpc_service.add(impl_CompoundSetUtils.fetch_mol2_files_from_zinc,
+                             name='CompoundSetUtils.fetch_mol2_files_from_zinc',
+                             types=[dict])
+        self.method_authentication['CompoundSetUtils.fetch_mol2_files_from_zinc'] = 'required'  # noqa
         self.rpc_service.add(impl_CompoundSetUtils.status,
                              name='CompoundSetUtils.status',
                              types=[dict])
