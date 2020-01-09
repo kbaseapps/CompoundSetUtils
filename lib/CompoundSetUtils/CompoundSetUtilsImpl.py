@@ -402,7 +402,7 @@ Contains tools for import & export of compound sets
         if count:
             message = 'Successfully fetched {} Mol2 files from ZINC database'.format(count)
         else:
-            message = 'Fetched 0 Mol2 files from ZINC database. CompoundSet object remains unchanged'
+            message = 'Fetched 0 Mol2 files from ZINC database. CompoundSet object remains unchanged.'
 
         output = self._save_to_ws_and_report(
                     params['workspace_id'], '', compoundset_copy,
