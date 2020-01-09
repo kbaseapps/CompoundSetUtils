@@ -51,6 +51,8 @@ class CompoundSetUtilsTest(unittest.TestCase):
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
 
+        cls.dfu = DataFileUtil(cls.callback_url)
+
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, 'wsId'):
@@ -227,3 +229,28 @@ class CompoundSetUtilsTest(unittest.TestCase):
             comp_ids.append(line.get('id'))
 
         self.assertCountEqual(mol2_file_names, comp_ids)
+
+    @patch.object(DataFileUtil, "download_staging_file",
+                  new=fake_staging_download)
+    def test_fetch_mol2_from_zinc(self):
+        params = {'workspace_id': self.getWsId(),
+                  'staging_file_path': 'test_compounds.tsv',
+                  'compound_set_name': 'tsv_set'}
+        ret = self.getImpl().compound_set_from_file(self.getContext(), params)[0]
+        compoundset_ref = ret['compoundset_ref']
+
+        compoundset = self.dfu.get_objects(
+                                {'object_refs': [compoundset_ref]})['data'][0]['data']
+        hids = [comp.get('mol2_handle_ref') for comp in compoundset['compounds']]
+
+        self.assertCountEqual(hids, [None]*9)
+
+        params = {'workspace_id': self.getWsId(),
+                  'compoundset_ref': compoundset_ref}
+        new_compoundset_ref = self.getImpl().fetch_mol2_files_from_zinc(
+                                            self.getContext(), params)[0]['compoundset_ref']
+        new_compoundset = self.dfu.get_objects(
+                                {'object_refs': [new_compoundset_ref]})['data'][0]['data']
+        new_hids = [comp.get('mol2_handle_ref') for comp in new_compoundset['compounds']]
+
+        self.assertTrue(new_hids.count(None) < 9)

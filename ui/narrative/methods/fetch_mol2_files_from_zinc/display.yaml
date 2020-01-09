@@ -1,0 +1,49 @@
+#
+# define display information
+#
+name: Fetch And Import Mol2 from ZINC Database To CompoundSet
+
+tooltip: |
+    This method fetches Mol2 file from ZINC by searching inchikey associated with compound and then save the Mol2 file to the compound object
+
+screenshots: []
+
+icon: data-blue.png
+
+#
+# define a set of similar methods that might be useful to the user
+#
+suggestions:
+    apps:
+        related:
+            []
+        next:
+            []
+    methods:
+        related:
+            []
+        next:
+            []
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    compoundset_ref :
+        ui-name : |
+            CompoundSet Object
+        short-hint : |
+            CompoundSet Object
+        long-hint  : |
+            CompoundSet Object
+    over_write :
+        ui-name : |
+            Overwrite Existing Mol2 File
+        short-hint : |
+            Replace existing Mol2 file with newly fetched Mol2 file from ZINC
+        long-hint  : |
+            Replace existing Mol2 file with newly fetched Mol2 file from ZINC
+
+
+description : |
+    <p>This app fetches Mol2 file from ZINC by searching inchikey associated with compound and then save the Mol2 file to the compound object.</p>

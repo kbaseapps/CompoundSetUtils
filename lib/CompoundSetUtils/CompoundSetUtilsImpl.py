@@ -4,8 +4,10 @@ import logging
 import os
 import uuid
 import zipfile
+import copy
 
 import CompoundSetUtils.compound_parsing as parse
+import CompoundSetUtils.zinc_db_util as zinc_db_util
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.KBaseReportClient import KBaseReport
 #END_HEADER
@@ -29,7 +31,7 @@ Contains tools for import & export of compound sets
     ######################################### noqa
     VERSION = "2.1.2"
     GIT_URL = "https://github.com/Tianhao-Gu/CompoundSetUtils.git"
-    GIT_COMMIT_HASH = "32b0376a54fca2de05bfbc5eca33d14bf5104ce3"
+    GIT_COMMIT_HASH = "4a83e7645d4a3740899cec7590122e7af2374587"
 
     #BEGIN_CLASS_HEADER
     @staticmethod
@@ -45,7 +47,7 @@ Contains tools for import & export of compound sets
             if param not in defined_param:
                 logging.warning("Received unexpected parameter {}".format(param))
 
-    def _save_to_ws_and_report(self, ws_id, source, compoundset):
+    def _save_to_ws_and_report(self, ws_id, source, compoundset, message=None):
         """Save compound set to the workspace and make report"""
         info = self.dfu.save_objects(
             {'id': ws_id,
@@ -55,10 +57,12 @@ Contains tools for import & export of compound sets
                  "name": compoundset['name']
              }]})[0]
         compoundset_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+        if not message:
+            message = 'Imported %s as %s' % (source, info[1])
         report_params = {
             'objects_created': [{'ref': compoundset_ref,
                                  'description': 'Compound Set'}],
-            'message': 'Imported %s as %s' % (source, info[1]),
+            'message': message,
             'workspace_name': info[7],
             'report_object_name': 'compound_set_creation_report'
         }
@@ -356,6 +360,52 @@ Contains tools for import & export of compound sets
         # At some point might do deeper type checking...
         if not isinstance(output, dict):
             raise ValueError('Method export_compoundset_mol2_files return value ' +
+                             'output is not type dict as required.')
+        # return the results
+        return [output]
+
+    def fetch_mol2_files_from_zinc(self, ctx, params):
+        """
+        :param params: instance of type "FetchZINCMol2Params" -> structure:
+           parameter "workspace_id" of String, parameter "compoundset_ref" of
+           type "obj_ref", parameter "over_write" of Long
+        :returns: instance of type "compoundset_upload_results" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "compoundset_ref" of type "obj_ref"
+        """
+        # ctx is the context object
+        # return variables are: output
+        #BEGIN fetch_mol2_files_from_zinc
+        self._check_param(params, ['workspace_id', 'compoundset_ref'], opt_param=['over_write'])
+        over_write = params.get('over_write', False)
+        compoundset = self.dfu.get_objects(
+                                {'object_refs': [params['compoundset_ref']]})['data'][0]['data']
+
+        compoundset_copy = copy.deepcopy(compoundset)
+
+        for compound in compoundset_copy.get('compounds'):
+            if not compound.get('mol2_handle_ref') or over_write:
+                temp_dir = os.path.join(self.scratch, str(uuid.uuid4()))
+                os.mkdir(temp_dir)
+                mol2_file_path = os.path.join(temp_dir, compound.get('id'))
+                inchikey = compound.get('inchikey')
+                if zinc_db_util.inchikey_to_mol2(inchikey, mol2_file_path):
+                    handle_id = self.dfu.file_to_shock({'file_path': mol2_file_path,
+                                                        'make_handle': True})['handle']['hid']
+                    compound['mol2_handle_ref'] = handle_id
+                    compound['mol2_source'] = 'ZINC15'
+                else:
+                    logging.warning('Cannot find Mol2 file from ZINC for {}'.format(inchikey))
+
+        output = self._save_to_ws_and_report(params['workspace_id'], '',
+                                             compoundset_copy,
+                                             message='Successfully fetched mol2 files from ZINC database')
+
+        #END fetch_mol2_files_from_zinc
+
+        # At some point might do deeper type checking...
+        if not isinstance(output, dict):
+            raise ValueError('Method fetch_mol2_files_from_zinc return value ' +
                              'output is not type dict as required.')
         # return the results
         return [output]
