@@ -7,7 +7,7 @@
     "categories": ["active", "util"],
     "widgets": {
         "input": null,
-        "output": null
+        "output": "no-display"
     },
     "parameters": [
         {
