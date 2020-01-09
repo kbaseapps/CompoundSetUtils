@@ -399,9 +399,14 @@ Contains tools for import & export of compound sets
                 else:
                     logging.warning('Cannot find Mol2 file from ZINC for {}'.format(inchikey))
 
+        if count:
+            message = 'Successfully fetched {} Mol2 files from ZINC database'.format(count)
+        else:
+            message = 'Fetched 0 Mol2 files from ZINC database. CompoundSet object remains unchanged'
+
         output = self._save_to_ws_and_report(
                     params['workspace_id'], '', compoundset_copy,
-                    message='Successfully fetched {} Mol2 files from ZINC database'.format(count))
+                    message=message)
 
         #END fetch_mol2_files_from_zinc
 
