@@ -5,6 +5,7 @@ import os
 import uuid
 import zipfile
 import copy
+from subprocess import Popen, PIPE
 
 import CompoundSetUtils.compound_parsing as parse
 import CompoundSetUtils.zinc_db_util as zinc_db_util
@@ -31,7 +32,7 @@ Contains tools for import & export of compound sets
     ######################################### noqa
     VERSION = "2.1.2"
     GIT_URL = "https://github.com/Tianhao-Gu/CompoundSetUtils.git"
-    GIT_COMMIT_HASH = "4a83e7645d4a3740899cec7590122e7af2374587"
+    GIT_COMMIT_HASH = "12e1f23022354f475d7ceb3631913956eb5831a7"
 
     #BEGIN_CLASS_HEADER
     @staticmethod
@@ -107,25 +108,74 @@ Contains tools for import & export of compound sets
 
         compounds = compoundset.get('compounds')
 
-        shock_to_file_params = []
+        mol2_files = []
+        comp_id_mol2_file_name_map = {}
         for compound in compounds:
             mol2_handle_ref = compound.get('mol2_handle_ref')
 
             if mol2_handle_ref:
-                shock_to_file_params.append({'handle_id': mol2_handle_ref,
-                                             'file_path': temp_dir})
+                mol2_file_path = self.dfu.shock_to_file(
+                                            {'handle_id': mol2_handle_ref,
+                                             'file_path': temp_dir}).get('file_path')
+                mol2_files.append(mol2_file_path)
+                comp_id_mol2_file_name_map[compound['id']] = os.path.basename(mol2_file_path)
 
-        mol2_packed_file_path = None
-        if shock_to_file_params:
-            stf_out = self.dfu.shock_to_file_mass(shock_to_file_params)
-            mol2_files = [item.get('file_path') for item in stf_out]
-            mol2_packed_file_path = os.path.join(temp_dir, compoundset_info[1] + '_mol2_files.zip')
-            with zipfile.ZipFile(mol2_packed_file_path, 'w') as zipMe:
+        packed_mol2_files_path = None
+        if mol2_files:
+            packed_mol2_files_path = os.path.join(temp_dir, compoundset_info[1] + '_mol2_files.zip')
+            with zipfile.ZipFile(packed_mol2_files_path, 'w') as zipMe:
                 for file in mol2_files:
                     zipMe.write(file, compress_type=zipfile.ZIP_DEFLATED)
 
-        return mol2_packed_file_path
+        return packed_mol2_files_path, comp_id_mol2_file_name_map
 
+    def _covert_mol2_files_to_pdbqt(self, ref):
+        compoundset_obj = self.dfu.get_objects(
+            {'object_refs': [ref]}
+        )['data'][0]
+        compoundset_info = compoundset_obj['info']
+        compoundset = compoundset_obj['data']
+        mol2_temp_dir = "{}/{}".format(self.scratch, uuid.uuid4())
+        os.mkdir(mol2_temp_dir)
+        pdbqt_temp_dir = "{}/{}".format(self.scratch, uuid.uuid4())
+        os.mkdir(pdbqt_temp_dir)
+
+        compounds = compoundset.get('compounds')
+
+        pdbqt_files = []
+        comp_id_pdbqt_file_name_map = {}
+        for compound in compounds:
+            mol2_handle_ref = compound.get('mol2_handle_ref')
+
+            if mol2_handle_ref:
+                mol2_file_path = self.dfu.shock_to_file(
+                                            {'handle_id': mol2_handle_ref,
+                                             'file_path': mol2_temp_dir}).get('file_path')
+                pdbqt_file_path = os.path.join(pdbqt_temp_dir, compound['id'] + '.pdbqt')
+
+                command = ['obabel', '-i', 'mol2', mol2_file_path, '-o', 'pdbqt', '-O', pdbqt_file_path]
+                process = Popen(command, stdout=PIPE, stderr=PIPE)
+                stdout, stderr = process.communicate()
+
+                if 'molecule converted' not in str(stderr):
+                    logging.warning('Cannot convert Mol2 file to pdbqt format: {}'.format(
+                                                            os.path.basename(mol2_file_path)))
+                    logging.warning(stderr)
+                else:
+                    logging.info('Successfully converted Mol2 to pdbqt format: {}'.format(
+                                                            os.path.basename(mol2_file_path)))
+                    pdbqt_files.append(pdbqt_file_path)
+                    comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(
+                                                                            pdbqt_file_path)
+
+        packed_pdbqt_files_path = None
+        if pdbqt_files:
+            packed_pdbqt_files_path = os.path.join(pdbqt_temp_dir, compoundset_info[1] + '_pdbqt_files.zip')
+            with zipfile.ZipFile(packed_pdbqt_files_path, 'w') as zipMe:
+                for file in pdbqt_files:
+                    zipMe.write(file, compress_type=zipfile.ZIP_DEFLATED)
+
+        return packed_pdbqt_files_path, comp_id_pdbqt_file_name_map
     #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
@@ -221,7 +271,8 @@ Contains tools for import & export of compound sets
            "output_format" of String
         :returns: instance of type "compoundset_download_results" ->
            structure: parameter "file_path" of String, parameter
-           "mol2_file_path" of String
+           "packed_mol2_files_path" of String, parameter
+           "comp_id_mol2_file_name_map" of mapping from String to String
         """
         # ctx is the context object
         # return variables are: output
@@ -242,9 +293,11 @@ Contains tools for import & export of compound sets
         else:
             outfile_path = parse.write_mol_dir(compoundset, out, ext)
 
-        mol2_file = self._fetch_mol2_files(params['compound_set_ref'])
+        packed_mol2_files_path, comp_id_mol2_file_name_map = self._fetch_mol2_files(
+                                                                    params['compound_set_ref'])
 
-        output = {'file_path': outfile_path, 'mol2_file_path': mol2_file}
+        output = {'file_path': outfile_path, 'packed_mol2_files_path': packed_mol2_files_path,
+                  'comp_id_mol2_file_name_map': comp_id_mol2_file_name_map}
 
         #END compound_set_to_file
 
@@ -345,21 +398,51 @@ Contains tools for import & export of compound sets
            structure functions for standard downloaders) -> structure:
            parameter "input_ref" of String
         :returns: instance of type "export_mol2_files_results" -> structure:
-           parameter "mol2_file_path" of String
+           parameter "packed_mol2_files_path" of String, parameter
+           "comp_id_mol2_file_name_map" of mapping from String to String
         """
         # ctx is the context object
         # return variables are: output
         #BEGIN export_compoundset_mol2_files
         self._check_param(params, ['input_ref'])
 
-        mol2_file = self._fetch_mol2_files(params['input_ref'])
+        packed_mol2_files_path, comp_id_mol2_file_name_map = self._fetch_mol2_files(params['input_ref'])
 
-        output = {'mol2_file_path': mol2_file}
+        output = {'packed_mol2_files_path': packed_mol2_files_path,
+                  'comp_id_mol2_file_name_map': comp_id_mol2_file_name_map}
         #END export_compoundset_mol2_files
 
         # At some point might do deeper type checking...
         if not isinstance(output, dict):
             raise ValueError('Method export_compoundset_mol2_files return value ' +
+                             'output is not type dict as required.')
+        # return the results
+        return [output]
+
+    def convert_compoundset_mol2_files_to_pdbqt(self, ctx, params):
+        """
+        :param params: instance of type "ExportParams" (input and output
+           structure functions for standard downloaders) -> structure:
+           parameter "input_ref" of String
+        :returns: instance of type "convert_mol2_files_results" -> structure:
+           parameter "packed_pdbqt_files_path" of String, parameter
+           "comp_id_pdbqt_file_name_map" of mapping from String to String
+        """
+        # ctx is the context object
+        # return variables are: output
+        #BEGIN convert_compoundset_mol2_files_to_pdbqt
+        self._check_param(params, ['input_ref'])
+
+        packed_pdbqt_files_path, comp_id_pdbqt_file_name_map = self._covert_mol2_files_to_pdbqt(
+                                                                            params['input_ref'])
+
+        output = {'packed_pdbqt_files_path': packed_pdbqt_files_path,
+                  'comp_id_pdbqt_file_name_map': comp_id_pdbqt_file_name_map}
+        #END convert_compoundset_mol2_files_to_pdbqt
+
+        # At some point might do deeper type checking...
+        if not isinstance(output, dict):
+            raise ValueError('Method convert_compoundset_mol2_files_to_pdbqt return value ' +
                              'output is not type dict as required.')
         # return the results
         return [output]

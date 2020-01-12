@@ -29,7 +29,8 @@ module CompoundSetUtils {
 
     typedef structure {
         string file_path;
-        string mol2_file_path;
+        string packed_mol2_files_path;
+        mapping<string, string> comp_id_mol2_file_name_map;
     } compoundset_download_results;
 
     typedef structure {
@@ -79,11 +80,20 @@ module CompoundSetUtils {
         returns (ExportOutput output) authentication required;
 
     typedef structure {
-        string mol2_file_path;
+        string packed_mol2_files_path;
+        mapping<string, string> comp_id_mol2_file_name_map;
     } export_mol2_files_results;
 
     funcdef export_compoundset_mol2_files(ExportParams params)
         returns (export_mol2_files_results output) authentication required;
+
+    typedef structure {
+        string packed_pdbqt_files_path;
+        mapping<string, string> comp_id_pdbqt_file_name_map;
+    } convert_mol2_files_results;
+
+    funcdef convert_compoundset_mol2_files_to_pdbqt(ExportParams params)
+        returns (convert_mol2_files_results output) authentication required;
 
     typedef structure {
         string workspace_id;
@@ -93,4 +103,5 @@ module CompoundSetUtils {
 
     funcdef fetch_mol2_files_from_zinc(FetchZINCMol2Params params)
         returns (compoundset_upload_results output) authentication required;
+
 };
