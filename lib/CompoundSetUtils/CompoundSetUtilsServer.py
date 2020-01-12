@@ -362,6 +362,10 @@ class Application(object):
                              name='CompoundSetUtils.export_compoundset_mol2_files',
                              types=[dict])
         self.method_authentication['CompoundSetUtils.export_compoundset_mol2_files'] = 'required'  # noqa
+        self.rpc_service.add(impl_CompoundSetUtils.convert_compoundset_mol2_files_to_pdbqt,
+                             name='CompoundSetUtils.convert_compoundset_mol2_files_to_pdbqt',
+                             types=[dict])
+        self.method_authentication['CompoundSetUtils.convert_compoundset_mol2_files_to_pdbqt'] = 'required'  # noqa
         self.rpc_service.add(impl_CompoundSetUtils.fetch_mol2_files_from_zinc,
                              name='CompoundSetUtils.fetch_mol2_files_from_zinc',
                              types=[dict])
