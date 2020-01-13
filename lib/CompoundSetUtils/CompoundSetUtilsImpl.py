@@ -157,16 +157,16 @@ Contains tools for import & export of compound sets
                 process = Popen(command, stdout=PIPE, stderr=PIPE)
                 stdout, stderr = process.communicate()
 
-                if 'molecule converted' not in str(stderr):
-                    logging.warning('Cannot convert Mol2 file to pdbqt format: {}'.format(
-                                                            os.path.basename(mol2_file_path)))
-                    logging.warning(stderr)
-                else:
+                if 'converted' in str(stderr) and 'molecule' in str(stderr):
                     logging.info('Successfully converted Mol2 to pdbqt format: {}'.format(
                                                             os.path.basename(mol2_file_path)))
                     pdbqt_files.append(pdbqt_file_path)
                     comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(
                                                                             pdbqt_file_path)
+                else:
+                    logging.warning('Cannot convert Mol2 file to pdbqt format: {}'.format(
+                                                            os.path.basename(mol2_file_path)))
+                    logging.warning(stderr)
 
         packed_pdbqt_files_path = None
         if pdbqt_files:
