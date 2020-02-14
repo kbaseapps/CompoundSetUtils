@@ -5,6 +5,7 @@ import os
 import uuid
 import zipfile
 import copy
+from subprocess import Popen, PIPE
 
 import CompoundSetUtils.compound_parsing as parse
 import CompoundSetUtils.zinc_db_util as zinc_db_util
@@ -156,6 +157,24 @@ Contains tools for import & export of compound sets
                 if pdbqt_file_path:
                     pdbqt_files.append(pdbqt_file_path)
                     comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(pdbqt_file_path)
+                else:
+                    logging.warning('Trying to convert mol2 with obabel')
+                    pdbqt_file_path = os.path.join(pdbqt_temp_dir, compound['id'] + '.pdbqt')
+
+                    command = ['obabel', '-i', 'mol2', mol2_file_path, '-o', 'pdbqt', '-O', pdbqt_file_path]
+                    process = Popen(command, stdout=PIPE, stderr=PIPE)
+                    stdout, stderr = process.communicate()
+
+                    if 'converted' in str(stderr) and 'molecule' in str(stderr):
+                        logging.info('Successfully converted Mol2 to pdbqt format: {}'.format(
+                                                                os.path.basename(mol2_file_path)))
+                        pdbqt_files.append(pdbqt_file_path)
+                        comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(
+                                                                                pdbqt_file_path)
+                    else:
+                        logging.warning('Cannot convert Mol2 file to pdbqt format: {}'.format(
+                                                                os.path.basename(mol2_file_path)))
+                        logging.warning(stderr)
 
         packed_pdbqt_files_path = None
         if pdbqt_files:
