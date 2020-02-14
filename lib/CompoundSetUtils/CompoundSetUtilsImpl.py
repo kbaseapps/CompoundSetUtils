@@ -153,8 +153,9 @@ Contains tools for import & export of compound sets
                                              'file_path': mol2_temp_dir}).get('file_path')
 
                 pdbqt_file_path = self.ad_vina.mol2_to_pdbqt(mol2_file_path, compound['id'])
-                pdbqt_files.append(pdbqt_file_path)
-                comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(pdbqt_file_path)
+                if pdbqt_file_path:
+                    pdbqt_files.append(pdbqt_file_path)
+                    comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(pdbqt_file_path)
 
         packed_pdbqt_files_path = None
         if pdbqt_files:
