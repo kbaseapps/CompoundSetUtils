@@ -5,12 +5,12 @@ import os
 import uuid
 import zipfile
 import copy
-from subprocess import Popen, PIPE
 
 import CompoundSetUtils.compound_parsing as parse
 import CompoundSetUtils.zinc_db_util as zinc_db_util
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.KBaseReportClient import KBaseReport
+from installed_clients.AD_VINAClient import AD_VINA
 #END_HEADER
 
 
@@ -151,22 +151,10 @@ Contains tools for import & export of compound sets
                 mol2_file_path = self.dfu.shock_to_file(
                                             {'handle_id': mol2_handle_ref,
                                              'file_path': mol2_temp_dir}).get('file_path')
-                pdbqt_file_path = os.path.join(pdbqt_temp_dir, compound['id'] + '.pdbqt')
 
-                command = ['obabel', '-i', 'mol2', mol2_file_path, '-o', 'pdbqt', '-O', pdbqt_file_path]
-                process = Popen(command, stdout=PIPE, stderr=PIPE)
-                stdout, stderr = process.communicate()
-
-                if 'converted' in str(stderr) and 'molecule' in str(stderr):
-                    logging.info('Successfully converted Mol2 to pdbqt format: {}'.format(
-                                                            os.path.basename(mol2_file_path)))
-                    pdbqt_files.append(pdbqt_file_path)
-                    comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(
-                                                                            pdbqt_file_path)
-                else:
-                    logging.warning('Cannot convert Mol2 file to pdbqt format: {}'.format(
-                                                            os.path.basename(mol2_file_path)))
-                    logging.warning(stderr)
+                pdbqt_file_path = self.ad_vina.mol2_to_pdbqt(mol2_file_path, compound['id'])
+                pdbqt_files.append(pdbqt_file_path)
+                comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(pdbqt_file_path)
 
         packed_pdbqt_files_path = None
         if pdbqt_files:
@@ -186,6 +174,7 @@ Contains tools for import & export of compound sets
         self.scratch = config['scratch']
         self.callback_url = os.environ['SDK_CALLBACK_URL']
         self.dfu = DataFileUtil(self.callback_url)
+        self.ad_vina = AD_VINA(self.callback_url)
         #END_CONSTRUCTOR
         pass
 

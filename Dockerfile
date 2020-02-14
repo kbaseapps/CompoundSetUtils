@@ -2,7 +2,7 @@ FROM kbase/sdkbase2:python
 MAINTAINER KBase Developer
 # -----------------------------------------
 RUN apt-get update
-RUN apt-get install -y wget openbabel
+RUN apt-get install -y wget
 
 RUN conda config --add channels  https://conda.anaconda.org/rdkit && \
     conda install -y nose \

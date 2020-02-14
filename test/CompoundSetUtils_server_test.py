@@ -181,6 +181,9 @@ class CompoundSetUtilsTest(unittest.TestCase):
         print(comp_ids)
         print(pdbqt_files)
 
+        for pdbqt_file in pdbqt_files:
+            self.assertTrue(os.path.getsize(pdbqt_file_path) > 0)
+
         # self.assertEqual(len(comp_ids) - 1, len(pdbqt_file_names))
         self.assertTrue(set(pdbqt_file_names).issubset(comp_ids))
 
