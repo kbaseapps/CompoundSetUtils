@@ -157,24 +157,24 @@ Contains tools for import & export of compound sets
                 if pdbqt_file_path:
                     pdbqt_files.append(pdbqt_file_path)
                     comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(pdbqt_file_path)
-                else:
-                    logging.warning('Trying to convert mol2 with obabel')
-                    pdbqt_file_path = os.path.join(pdbqt_temp_dir, compound['id'] + '.pdbqt')
+                # else:
+                #     logging.warning('Trying to convert mol2 with obabel')
+                #     pdbqt_file_path = os.path.join(pdbqt_temp_dir, compound['id'] + '.pdbqt')
 
-                    command = ['obabel', '-i', 'mol2', mol2_file_path, '-o', 'pdbqt', '-O', pdbqt_file_path]
-                    process = Popen(command, stdout=PIPE, stderr=PIPE)
-                    stdout, stderr = process.communicate()
+                #     command = ['obabel', '-i', 'mol2', mol2_file_path, '-o', 'pdbqt', '-O', pdbqt_file_path]
+                #     process = Popen(command, stdout=PIPE, stderr=PIPE)
+                #     stdout, stderr = process.communicate()
 
-                    if 'converted' in str(stderr) and 'molecule' in str(stderr):
-                        logging.info('Successfully converted Mol2 to pdbqt format: {}'.format(
-                                                                os.path.basename(mol2_file_path)))
-                        pdbqt_files.append(pdbqt_file_path)
-                        comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(
-                                                                                pdbqt_file_path)
-                    else:
-                        logging.warning('Cannot convert Mol2 file to pdbqt format: {}'.format(
-                                                                os.path.basename(mol2_file_path)))
-                        logging.warning(stderr)
+                #     if 'converted' in str(stderr) and 'molecule' in str(stderr):
+                #         logging.info('Successfully converted Mol2 to pdbqt format: {}'.format(
+                #                                                 os.path.basename(mol2_file_path)))
+                #         pdbqt_files.append(pdbqt_file_path)
+                #         comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(
+                #                                                                 pdbqt_file_path)
+                #     else:
+                #         logging.warning('Cannot convert Mol2 file to pdbqt format: {}'.format(
+                #                                                 os.path.basename(mol2_file_path)))
+                #         logging.warning(stderr)
 
         packed_pdbqt_files_path = None
         if pdbqt_files:
@@ -195,6 +195,8 @@ Contains tools for import & export of compound sets
         self.callback_url = os.environ['SDK_CALLBACK_URL']
         self.dfu = DataFileUtil(self.callback_url)
         self.ad_vina = AD_VINA(self.callback_url)
+        logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
+                            level=logging.INFO)
         #END_CONSTRUCTOR
         pass
 
@@ -480,7 +482,7 @@ Contains tools for import & export of compound sets
             if not compound.get('mol2_handle_ref') or over_write:
                 temp_dir = os.path.join(self.scratch, str(uuid.uuid4()))
                 os.mkdir(temp_dir)
-                mol2_file_path = os.path.join(temp_dir, compound.get('id'))
+                mol2_file_path = os.path.join(temp_dir, compound.get('id') + '.mol2')
                 inchikey = compound.get('inchikey')
                 if zinc_db_util.inchikey_to_mol2(inchikey, mol2_file_path):
                     handle_id = self.dfu.file_to_shock({'file_path': mol2_file_path,
