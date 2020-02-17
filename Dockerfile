@@ -10,6 +10,16 @@ RUN conda config --add channels  https://conda.anaconda.org/rdkit && \
                      nomkl \
                      rdkit
 
+RUN curl --location http://mgltools.scripps.edu/downloads/downloads/tars/releases/REL1.5.6/mgltools_x86_64Linux2_1.5.6.tar.gz > mgltools.tar.gz && \
+tar vxzf mgltools.tar.gz && \                                                                       
+rm mgltools.tar.gz && \                                                                             
+mv mgltools_x86_64Linux2_1.5.6 /usr/local/lib/ && \                                                  
+cd /usr/local/lib/mgltools_x86_64Linux2_1.5.6 && \                                                  
+./install.sh                                                                                        
+                                                                                                    
+ENV PATH="${PATH}:/usr/local/lib/mgltools_x86_64Linux2_1.5.6/bin" 
+
+
 COPY ./ /kb/module
 RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
