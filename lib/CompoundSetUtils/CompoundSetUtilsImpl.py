@@ -11,7 +11,6 @@ import CompoundSetUtils.compound_parsing as parse
 import CompoundSetUtils.zinc_db_util as zinc_db_util
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.KBaseReportClient import KBaseReport
-from installed_clients.AD_VINAClient import AD_VINA
 #END_HEADER
 
 
@@ -33,7 +32,7 @@ Contains tools for import & export of compound sets
     ######################################### noqa
     VERSION = "2.1.2"
     GIT_URL = "https://github.com/Tianhao-Gu/CompoundSetUtils.git"
-    GIT_COMMIT_HASH = "12e1f23022354f475d7ceb3631913956eb5831a7"
+    GIT_COMMIT_HASH = "2ed95386d87f69aa8608f3dcbc32ee26be391c38"
 
     #BEGIN_CLASS_HEADER
     @staticmethod
@@ -130,6 +129,36 @@ Contains tools for import & export of compound sets
 
         return packed_mol2_files_path, comp_id_mol2_file_name_map
 
+    def _mol2_to_pdbqt(self, mol2_file_path, compound_id):
+
+        logging.info('start converting mol2 to pdbqt')
+
+        autodocker_util_dir = '/usr/local/lib/mgltools_x86_64Linux2_1.5.6/MGLToolsPckgs/AutoDockTools/Utilities24'
+
+        pdbqt_temp_dir = "{}/{}".format(self.scratch, uuid.uuid4())
+        os.mkdir(pdbqt_temp_dir)
+
+        pdbqt_file_path = os.path.join(pdbqt_temp_dir, compound_id + '.pdbqt')
+
+        prepare_ligand4_filepath = os.path.join(autodocker_util_dir, 'prepare_ligand4.py')
+
+        command = ['python2.5', prepare_ligand4_filepath, '-l', mol2_file_path, '-o', pdbqt_file_path]
+
+        process = Popen(command, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = process.communicate()
+
+        logging.info('completed prepare_ligand4\nstdout:{}\nstderr:{}\n'.format(stdout, stderr))
+
+        if not os.path.exists(pdbqt_file_path):
+            pdbqt_file_path = ''
+            raise ValueError('failed to convert mol2 to pdbqt format')
+        else:
+            file_size = os.path.getsize(pdbqt_file_path)
+            if file_size == 0:
+                raise ValueError('generated empty pdbqt file')
+
+        return pdbqt_file_path
+
     def _covert_mol2_files_to_pdbqt(self, ref):
         compoundset_obj = self.dfu.get_objects(
             {'object_refs': [ref]}
@@ -153,7 +182,7 @@ Contains tools for import & export of compound sets
                                             {'handle_id': mol2_handle_ref,
                                              'file_path': mol2_temp_dir}).get('file_path')
 
-                pdbqt_file_path = self.ad_vina.mol2_to_pdbqt(mol2_file_path, compound['id'])
+                pdbqt_file_path = self._mol2_to_pdbqt(mol2_file_path, compound['id'])
                 if pdbqt_file_path:
                     pdbqt_files.append(pdbqt_file_path)
                     comp_id_pdbqt_file_name_map[compound['id']] = os.path.basename(pdbqt_file_path)
@@ -194,7 +223,6 @@ Contains tools for import & export of compound sets
         self.scratch = config['scratch']
         self.callback_url = os.environ['SDK_CALLBACK_URL']
         self.dfu = DataFileUtil(self.callback_url)
-        self.ad_vina = AD_VINA(self.callback_url)
         logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
                             level=logging.INFO)
         #END_CONSTRUCTOR
@@ -463,9 +491,10 @@ Contains tools for import & export of compound sets
         :param params: instance of type "FetchZINCMol2Params" -> structure:
            parameter "workspace_id" of String, parameter "compoundset_ref" of
            type "obj_ref", parameter "over_write" of Long
-        :returns: instance of type "compoundset_upload_results" -> structure:
+        :returns: instance of type "fetch_zinc_mol2_results" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
-           String, parameter "compoundset_ref" of type "obj_ref"
+           String, parameter "compoundset_ref" of type "obj_ref", parameter
+           "mol2_files_dir" of String
         """
         # ctx is the context object
         # return variables are: output
@@ -477,12 +506,13 @@ Contains tools for import & export of compound sets
 
         compoundset_copy = copy.deepcopy(compoundset)
 
+        mol2_temp_dir = os.path.join(self.scratch, str(uuid.uuid4()))
+        os.mkdir(mol2_temp_dir)
+
         count = 0
         for compound in compoundset_copy.get('compounds'):
             if not compound.get('mol2_handle_ref') or over_write:
-                temp_dir = os.path.join(self.scratch, str(uuid.uuid4()))
-                os.mkdir(temp_dir)
-                mol2_file_path = os.path.join(temp_dir, compound.get('id') + '.mol2')
+                mol2_file_path = os.path.join(mol2_temp_dir, compound.get('id') + '.mol2')
                 inchikey = compound.get('inchikey')
                 if zinc_db_util.inchikey_to_mol2(inchikey, mol2_file_path):
                     handle_id = self.dfu.file_to_shock({'file_path': mol2_file_path,
@@ -497,10 +527,13 @@ Contains tools for import & export of compound sets
             message = 'Successfully fetched {} Mol2 files from ZINC database'.format(count)
         else:
             message = 'Fetched 0 Mol2 files from ZINC database. The CompoundSet object remains unchanged.'
+            mol2_temp_dir = None
 
         output = self._save_to_ws_and_report(
                     params['workspace_id'], '', compoundset_copy,
                     message=message)
+
+        output['mol2_files_dir'] = mol2_temp_dir
 
         #END fetch_mol2_files_from_zinc
 

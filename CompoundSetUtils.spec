@@ -101,7 +101,14 @@ module CompoundSetUtils {
         int over_write;
     } FetchZINCMol2Params;
 
+    typedef structure {
+        string report_name;
+        string report_ref;
+        obj_ref compoundset_ref;
+        string mol2_files_dir;
+    } fetch_zinc_mol2_results;
+
     funcdef fetch_mol2_files_from_zinc(FetchZINCMol2Params params)
-        returns (compoundset_upload_results output) authentication required;
+        returns (fetch_zinc_mol2_results output) authentication required;
 
 };
