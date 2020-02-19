@@ -86,6 +86,8 @@ class CompoundSetUtilsTest(unittest.TestCase):
 
     def save_compound_set(self):
         comp_set = pickle.load(open('/kb/module/test/compound_set.pkl', 'rb'))
+        for compound in comp_set['compounds']:
+            compound['kb_id'] = compound['id']
         ws_obj = {"type": "KBaseBiochem.CompoundSet", "data": comp_set,
                   "name": comp_set['name']}
         info = self.getWsClient().save_objects({'id': self.getWsId(),

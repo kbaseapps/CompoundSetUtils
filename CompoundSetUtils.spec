@@ -101,6 +101,9 @@ module CompoundSetUtils {
         int over_write;
     } FetchZINCMol2Params;
 
+    /*
+    mol2_files_dir: only contains mol2 files fetched from ZINC database.
+    */
     typedef structure {
         string report_name;
         string report_ref;

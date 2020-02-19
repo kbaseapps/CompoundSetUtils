@@ -138,14 +138,15 @@ def read_sdf(file_path, inchi_path='/kb/module/data/Inchikey_IDs.json', mol2_fil
     return compounds
 
 
-def parse_model(model, struct_path='/kb/module/data/Compound_Structures.json'):
+def parse_model(model, struct_path='/kb/module/data/Compound_Structures.json',
+                inchi_path='/kb/module/data/Inchikey_IDs.json'):
     # At the moment this function relies on cached data. when I get a chance
     # I'll figure how to pull the biochemistry object from the workspace so it
     # stays up to date
     struct_dict = json.load(open(struct_path))
     compounds = []
     undef_structures = []
-    for model_comp in model['modelcompounds']:
+    for i, model_comp in enumerate(model['modelcompounds']):
         cid = model_comp['id'].split('_')[0]
         if cid not in struct_dict:
             undef_structures.append(cid)
@@ -156,7 +157,13 @@ def parse_model(model, struct_path='/kb/module/data/Compound_Structures.json'):
                     'modelcompound_ref': model_comp['id'],
                     }
         mol = AllChem.MolFromInchi(str(struct_dict[cid]))
-        set_comp.update(_make_compound_info(mol))
+        comp = _make_compound_info(mol)
+        inchi_dict = json.load(open(inchi_path))
+        if comp['inchikey'] in inchi_dict:
+            comp['kb_id'] = inchi_dict[comp['inchikey']]
+        else:
+            comp['kb_id'] = '%s_%s' % (cid, i + 1)
+        set_comp.update(comp)
         compounds.append(set_comp)
     return compounds, undef_structures
 

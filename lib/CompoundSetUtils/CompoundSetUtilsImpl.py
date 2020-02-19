@@ -32,7 +32,7 @@ Contains tools for import & export of compound sets
     ######################################### noqa
     VERSION = "2.1.2"
     GIT_URL = "https://github.com/Tianhao-Gu/CompoundSetUtils.git"
-    GIT_COMMIT_HASH = "2ed95386d87f69aa8608f3dcbc32ee26be391c38"
+    GIT_COMMIT_HASH = "962f902dc294b8bb7544e3e9114aca274bbfca9e"
 
     #BEGIN_CLASS_HEADER
     @staticmethod
@@ -491,10 +491,11 @@ Contains tools for import & export of compound sets
         :param params: instance of type "FetchZINCMol2Params" -> structure:
            parameter "workspace_id" of String, parameter "compoundset_ref" of
            type "obj_ref", parameter "over_write" of Long
-        :returns: instance of type "fetch_zinc_mol2_results" -> structure:
-           parameter "report_name" of String, parameter "report_ref" of
-           String, parameter "compoundset_ref" of type "obj_ref", parameter
-           "mol2_files_dir" of String
+        :returns: instance of type "fetch_zinc_mol2_results" (mol2_files_dir:
+           only contains mol2 files fetched from ZINC database.) ->
+           structure: parameter "report_name" of String, parameter
+           "report_ref" of String, parameter "compoundset_ref" of type
+           "obj_ref", parameter "mol2_files_dir" of String
         """
         # ctx is the context object
         # return variables are: output
