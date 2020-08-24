@@ -1,14 +1,17 @@
 FROM kbase/sdkbase2:python
-MAINTAINER KBase Developer
+MAINTAINER KBase Developer2
 # -----------------------------------------
-RUN apt-get update
-RUN apt-get install -y wget openbabel
+RUN apt-get update -y && \
+    apt-get install -y wget openbabel
 
 RUN conda config --add channels  https://conda.anaconda.org/rdkit && \
     conda install -y nose \
                      cairo \
                      nomkl \
                      rdkit
+
+RUN pip install --upgrade pip && \
+    pip install jinja2 requests jsonrpcbase
 
 RUN curl --location http://mgltools.scripps.edu/downloads/downloads/tars/releases/REL1.5.6/mgltools_x86_64Linux2_1.5.6.tar.gz > mgltools.tar.gz && \
 tar vxzf mgltools.tar.gz && \                                                                       
