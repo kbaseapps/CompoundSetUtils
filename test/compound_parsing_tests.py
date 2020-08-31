@@ -53,10 +53,10 @@ class CompoundParseingTest(unittest.TestCase):
     def test_parse_model(self):
         model = json.load(open('iMR1_799.json'))
         compounds, undefined = compound_parsing.parse_model(model, '../data/Compound_Structures.json')
-        self.assertEqual(len(compounds), 424)
-        self.assertEqual(len(undefined), 321)
+        self.assertEqual(len(compounds), 415)
+        self.assertEqual(len(undefined), 330)
         self.assertEqual(compounds[0]['id'], 'cpd01892')
-        self.assertEqual(undefined[0], 'cpd11493')
+        self.assertEqual(undefined[0], 'cpd17002')
 
     def test_write_tsv(self):
         expected_file = 'test.tsv'
